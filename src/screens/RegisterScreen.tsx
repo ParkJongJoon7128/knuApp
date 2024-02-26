@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import {
     Alert,
     SafeAreaView,
+    StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
@@ -48,36 +49,99 @@ const RegisterScreen = () => {
 
   // Views
   return (
-    <SafeAreaView
-      style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <View>
-        <TextInput
-          onChangeText={e => setName(e)}
-          value={name}
-          placeholder="Name"
-          style={{borderWidth: 1, height: 40, padding: 10, margin: 10}}
-        />
-        <TextInput
-          onChangeText={e => setEmail(e)}
-          value={email}
-          placeholder="Email"
-          style={{borderWidth: 1, height: 40, padding: 10, margin: 10}}
-        />
-        <TextInput
-          onChangeText={e => setPassword(e)}
-          value={password}
-          placeholder="PassWord"
-          style={{borderWidth: 1, height: 40, padding: 10, margin: 10}}
-        />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.wrapper}>
+        <View style={styles.logo_wrapper}>
+          <Text style={styles.logo}>Register</Text>
+        </View>
 
-        <TouchableOpacity
-          style={{padding: 10, margin: 10}}
-          onPress={() => Register(name, email, password)}>
-          <Text>Register</Text>
-        </TouchableOpacity>
+        <View style={styles.textinput_wrapper}>
+          <TextInput
+            onChangeText={e => setName(e)}
+            value={name}
+            placeholder="Name"
+            style={styles.textinput}
+          />
+        </View>
+
+        <View style={styles.textinput_wrapper}>
+          <TextInput
+            onChangeText={e => setEmail(e)}
+            value={email}
+            placeholder="Email"
+            style={styles.textinput}
+          />
+        </View>
+
+        <View style={styles.textinput_wrapper}>
+          <TextInput
+            onChangeText={e => setPassword(e)}
+            value={password}
+            placeholder="PassWord"
+            secureTextEntry={true}
+            style={styles.textinput}
+          />
+        </View>
+
+        <View style={styles.register_button_wrapper}>
+          <TouchableOpacity
+            onPress={() => Register(name, email, password)}
+            style={styles.register_button}>
+            <Text style={styles.register_button_text}>Register</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  wrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 30,
+  },
+  logo_wrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 30,
+  },
+  logo: {
+    fontSize: 25,
+    marginBottom: 15,
+  },
+  textinput_wrapper: {
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
+    borderRadius: 10,
+    margin: 10,
+    padding: 10,
+  },
+  textinput: {
+    margin: 0,
+    padding: 0,
+  },
+  register_button_wrapper: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10,
+    borderRadius: 10,
+    backgroundColor: '#11998e',
+  },
+  register_button: {
+    padding: 10,
+    margin: 5,
+  },
+  register_button_text: {
+    color: '#fff',
+  },
+});
 
 export default RegisterScreen;
