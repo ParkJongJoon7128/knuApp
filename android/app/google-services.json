@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "760317491631",
+    "project_id": "knuintroapp",
+    "storage_bucket": "knuintroapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:760317491631:android:105876ecd97343b76a975a",
+        "android_client_info": {
+          "package_name": "com.knuapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiEiVqikJDDGlyYwMwCZ46ZTyQHBJUHzo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
