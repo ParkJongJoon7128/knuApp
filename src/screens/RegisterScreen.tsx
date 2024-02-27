@@ -1,14 +1,15 @@
 import { firebase } from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
-    Alert,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const RegisterScreen = () => {
@@ -17,6 +18,8 @@ const RegisterScreen = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const userCollection = firestore().collection('users');
 
   const Register = (name: string, email: string, password: string) => {
     if (!name || !email || !password) {
@@ -27,19 +30,12 @@ const RegisterScreen = () => {
         .createUserWithEmailAndPassword(email, password)
         .then(result => {
           const {uid} = result.user;
-          firebase.auth().currentUser?.updateProfile({
-            displayName: name,
-          });
-          console.log(
-            result.user.email,
-            result.user.displayName,
-            result.user.uid,
-          );
+          firebase.auth().currentUser?.updateProfile({displayName: name});
+          userCollection.doc(uid).set({uid, name, email, password});
           setName('');
           setEmail('');
           setPassword('');
           navigation.navigate('Login');
-          return uid;
         })
         .catch(err => {
           console.log(err.message);
