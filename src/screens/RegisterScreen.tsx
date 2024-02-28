@@ -31,7 +31,7 @@ const RegisterScreen = () => {
         .then(result => {
           const {uid} = result.user;
           firebase.auth().currentUser?.updateProfile({displayName: name});
-          userCollection.doc(uid).set({uid, name, email, password});
+          userCollection.doc(uid).set({uid, name, email});
           setName('');
           setEmail('');
           setPassword('');
