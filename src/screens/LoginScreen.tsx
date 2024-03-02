@@ -2,12 +2,12 @@ import { firebase } from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
-    Alert,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -26,6 +26,7 @@ const LoginScreen = () => {
         .signInWithEmailAndPassword(email, password)
         .then(result => {
           console.log(
+            'Login: ',
             result.user.email,
             result.user.displayName,
             result.user.uid,

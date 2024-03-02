@@ -1,6 +1,7 @@
 import { firebase } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -15,7 +16,7 @@ import {
 const RegisterScreen = () => {
   // Logic
   const navigation = useNavigation();
-  const [name, setName] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -30,12 +31,20 @@ const RegisterScreen = () => {
         .createUserWithEmailAndPassword(email, password)
         .then(result => {
           const {uid} = result.user;
-          firebase.auth().currentUser?.updateProfile({displayName: name});
-          userCollection.doc(uid).set({uid, name, email});
-          setName('');
+          firebase.auth().currentUser?.updateProfile({displayName});
+          userCollection
+            .doc(uid)
+            .set({
+              date_created: moment().utc().format(),
+              uid,
+              name,
+              email
+            });
+          setDisplayName('');
           setEmail('');
           setPassword('');
           navigation.navigate('Login');
+          console.log("Register: ", result.user);
         })
         .catch(err => {
           console.log(err.message);
@@ -53,9 +62,9 @@ const RegisterScreen = () => {
 
         <View style={styles.textinput_wrapper}>
           <TextInput
-            onChangeText={e => setName(e)}
-            value={name}
-            placeholder="Name"
+            onChangeText={e => setDisplayName(e)}
+            value={displayName}
+            placeholder="NickName"
             style={styles.textinput}
           />
         </View>
@@ -81,7 +90,7 @@ const RegisterScreen = () => {
 
         <View style={styles.register_button_wrapper}>
           <TouchableOpacity
-            onPress={() => Register(name, email, password)}
+            onPress={() => Register(displayName, email, password)}
             style={styles.register_button}>
             <Text style={styles.register_button_text}>Register</Text>
           </TouchableOpacity>
