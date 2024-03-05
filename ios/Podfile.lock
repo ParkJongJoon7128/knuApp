@@ -795,6 +795,9 @@ PODS:
     - nanopb/encode (= 2.30909.1)
   - nanopb/decode (2.30909.1)
   - nanopb/encode (2.30909.1)
+  - NMapsGeometry (1.0.1)
+  - NMapsMap (3.17.0):
+    - NMapsGeometry
   - PromisesObjC (2.4.0)
   - RCT-Folly (2022.05.16.00):
     - boost
@@ -1667,6 +1670,9 @@ PODS:
   - React-Mapbuffer (0.73.4):
     - glog
     - React-debug
+  - react-native-nmap (0.0.67):
+    - NMapsMap
+    - React
   - react-native-safe-area-context (4.9.0):
     - React-Core
   - React-nativeconfig (0.73.4)
@@ -1893,6 +1899,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector-modern`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
+  - react-native-nmap (from `../node_modules/react-native-nmap`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -1942,6 +1949,8 @@ SPEC REPOS:
     - leveldb-library
     - libevent
     - nanopb
+    - NMapsGeometry
+    - NMapsMap
     - PromisesObjC
     - RecaptchaInterop
     - SocketRocket
@@ -2002,6 +2011,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   React-Mapbuffer:
     :path: "../node_modules/react-native/ReactCommon"
+  react-native-nmap:
+    :path: "../node_modules/react-native-nmap"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-nativeconfig:
@@ -2083,6 +2094,8 @@ SPEC CHECKSUMS:
   leveldb-library: e74c27d8fbd22854db7cb467968a0b8aa1db7126
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
+  NMapsGeometry: 53c573ead66466681cf123f99f698dc8071a4b83
+  NMapsMap: a5b909a31b6f3d27a670f6eb2ddc913c38975474
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RCT-Folly: 7169b2b1c44399c76a47b5deaaba715eeeb476c0
   RCTRequired: ab7f915c15569f04a49669e573e6e319a53f9faa
@@ -2105,6 +2118,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 9ac353eccf6ab54d1e0a33862ba91221d1e88460
   React-logger: 0a57b68dd2aec7ff738195f081f0520724b35dab
   React-Mapbuffer: 114be72666d7e3e317c1a36fb566cd3ad712fcc8
+  react-native-nmap: 057c4e7b1b765b234ab4b0a6c5ccd9baaf3bc9c7
   react-native-safe-area-context: b97eb6f9e3b7f437806c2ce5983f479f8eb5de4b
   React-nativeconfig: ca8b90c736cf3be019cb332ca42d93dd95b32e05
   React-NativeModulesApple: 1fdffcce7772e274baeab33a1900f45feba86cbd

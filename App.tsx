@@ -8,6 +8,7 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
+import ItemScreen from './src/screens/ItemScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import MainScreen from './src/screens/MainScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
@@ -20,7 +21,7 @@ function App(): React.JSX.Element {
   // Views
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -34,6 +35,12 @@ function App(): React.JSX.Element {
         <Stack.Screen
           name="Main"
           component={MainScreen}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Item"
+          component={ItemScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
