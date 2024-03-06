@@ -1,17 +1,26 @@
+import { API_URL, NAVER_MAP_API_KEY_ID, NAVER_MAP_API_SECRET } from '@env';
 import { firebase } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const MainScreen = () => {
   // Logic
   const navigation = useNavigation();
-  const [user, setUser] = useState();
   const [address, setAddress] = useState('');
   const [initializing, setInitializing] = useState(true);
-  const [filterData, setFilterData] = useState([]);
-  const [masterData, setMasterData] = useState([]);
+  const [user, setUser] = useState();
+  // const [filterData, setFilterData] = useState([]);
+  // const [masterData, setMasterData] = useState([]);
 
   const userCollection = firestore().collection('users');
 
@@ -68,86 +77,109 @@ const MainScreen = () => {
   //   }
   // };
 
-  // const searchAddress = async (address: string) => {
+  // await axios
+  //   .get(apiURL, {
+  //     params: {
+  //       query: address,
+  //     },
+  //     headers: {
+  //       'X-NCP-APIGW-API-KEY-ID': apiKeyID,
+  //       'X-NCP-APIGW-API-KEY': apiKey,
+  //     },
+  //   })
+  //   .then(res => console.log(res.data))
+  //   .catch(err => {
+  //     console.log(err);
+  //   });
+
+  const searchAddress = async (address: string) => {
+    try {
+      const apiURL = API_URL;
+      const clientID = NAVER_MAP_API_KEY_ID;
+      const clientSecret = NAVER_MAP_API_SECRET;
+
+      const response = await axios.get(apiURL, {
+        headers: {
+          'X-NCP-APIGW-API-KEY-ID': clientID,
+          'X-NCP-APIGW-API-KEY': clientSecret,
+        },
+        params: {
+          query: address,
+        },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // const test = async () => {
   //   try {
-  //     const response = await axios.post(
-  //       'url',
-  //       address,
-  //     );
-  //     const result = response.data;
-  //     setAddress(result);
+  //     const apiURL = 'https://jsonplaceholder.typicode.com/posts';
+  //     fetch(apiURL)
+  //       .then(res => res.json())
+  //       .then(resJson => {
+  //         setFilterData(resJson);
+  //         setMasterData(resJson);
+  //       })
+  //       .catch(err => {
+  //         console.log('err: ', err);
+  //       });
   //   } catch (error) {
-  //     console.log(error);
+  //     console.log('error: ', error);
   //   }
   // };
 
-  const test = async () => {
-    try {
-      const apiURL = 'https://jsonplaceholder.typicode.com/posts';
-      fetch(apiURL)
-        .then(res => res.json())
-        .then(resJson => {
-          setFilterData(resJson);
-          setMasterData(resJson);
-        })
-        .catch(err => {
-          console.log('err: ', err);
-        });
-    } catch (error) {
-      console.log('error: ', error);
-    }
-  };
-
-  const searchFilter = text => {
-    if (text) {
-      const newData = masterData.filter(item => {
-        const itemData = item.title ? item.title : '';
-        const textData = text;
-        return itemData.indexOf(textData) > -1;
-      });
-      setFilterData(newData);
-      setAddress(text);
-    } else {
-      setFilterData(masterData);
-      setAddress(text);
-    }
-  };
+  // const searchFilter = text => {
+  //   if (text) {
+  //     const newData = masterData.filter(item => {
+  //       const itemData = item.title ? item.title : '';
+  //       const textData = text;
+  //       return itemData.indexOf(textData) > -1;
+  //     });
+  //     setFilterData(newData);
+  //     setAddress(text);
+  //   } else {
+  //     setFilterData(masterData);
+  //     setAddress(text);
+  //   }
+  // };
 
   useEffect(() => {
     const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber;
   }, []);
 
-  useEffect(() => {
-    test();
-  }, []);
+  // useEffect(() => {
+  //   searchAddress();
+  // }, []);
 
   if (initializing) {
     return null;
   }
 
-  const renderItem = ({item}) => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          padding: 10,
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('Item', {item: item, user: user});
-          }}>
-          <Text style={{alignSelf: 'flex-start'}}>{item.title}</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  // const renderItem = ({item}) => {
+  //   return (
+  //     <View
+  //       style={{
+  //         flex: 1,
+  //         padding: 10,
+  //       }}>
+  //       <TouchableOpacity
+  //         onPress={() => {
+  //           navigation.navigate('Item', {item: item, user: user});
+  //         }}>
+  //         <Text style={{alignSelf: 'flex-start'}}>{item.title}</Text>
+  //       </TouchableOpacity>
+  //     </View>
+  //   );
+  // };
 
-  const ItemSeparatorView = () => {
-    return (
-      <View style={{height: 0.5, width: '100%', backgroundColor: '#c8c8c8'}} />
-    );
-  };
+  // const ItemSeparatorView = () => {
+  //   return (
+  //     <View style={{height: 0.5, width: '100%', backgroundColor: '#c8c8c8'}} />
+  //   );
+  // };
 
   // Views
   return (
@@ -161,13 +193,27 @@ const MainScreen = () => {
             style={styles.textinput}
           />
         </View>
+
+        <View
+          style={{
+            margin: 10,
+            padding: 10,
+            backgroundColor: 'yellow',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <TouchableOpacity onPress={() => searchAddress(address)}>
+            <Text>검색</Text>
+          </TouchableOpacity>
+        </View>
         <View>
-          <FlatList
+          {/* <FlatList
             data={filterData}
             keyExtractor={(item, index) => index.toString()}
             ItemSeparatorComponent={ItemSeparatorView}
             renderItem={renderItem}
-          />
+          /> */}
         </View>
 
         {/* <View style={{alignSelf: 'flex-start'}}>
@@ -177,7 +223,6 @@ const MainScreen = () => {
         <View style={{alignSelf: 'flex-start'}}>
           <Text>displayName: {user?.displayName}</Text>
         </View>
-
         <View style={{alignSelf: 'flex-start'}}>
           <Text>email: {user?.email}</Text>
         </View>

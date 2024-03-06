@@ -1,14 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { SafeAreaView, View } from 'react-native';
-import NaverMapView, {
-  Circle,
-  Marker,
-  Path,
-  Polygon,
-  Polyline,
-} from 'react-native-nmap';
+import { SafeAreaView, Text, View } from 'react-native';
 
 const ItemScreen = ({route}) => {
   // Logics
@@ -42,8 +35,8 @@ const ItemScreen = ({route}) => {
   // Views
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <NaverMapView
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', margin: 15}}>
+        {/* <NaverMapView
           style={{width: '100%', height: '100%', flex: 1}}
           showsMyLocationButton={true}
           center={{...P0, zoom: 16}}
@@ -81,13 +74,13 @@ const ItemScreen = ({route}) => {
             color={`rgba(0, 0, 0, 0.5)`}
             onClick={() => console.log('onClick! polygon')}
           />
-        </NaverMapView>
-        {/* <Text>{item.title}</Text>
-      <View style={{padding: 10, margin: 30, backgroundColor: 'yellow'}}>
-        <TouchableOpacity onPress={() => addItem(item, user)}>
-          <Text>데이터 추가</Text>
-        </TouchableOpacity>
-      </View> */}
+        </NaverMapView> */}
+        <Text>{item.title}</Text>
+        {/* <View style={{padding: 10, margin: 30, backgroundColor: 'yellow'}}>
+          <TouchableOpacity onPress={() => addItem(item, user)}>
+            <Text>데이터 추가</Text>
+          </TouchableOpacity>
+        </View> */}
       </View>
     </SafeAreaView>
   );
