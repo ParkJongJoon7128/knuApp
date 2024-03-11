@@ -3,7 +3,7 @@ import firestore, { firebase } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, TextInput, View } from 'react-native';
+import { Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import NaverMapView, { Marker } from 'react-native-nmap';
 
@@ -80,34 +80,32 @@ const MainScreen = () => {
   // Views
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.wrapper}>
-        <View style={styles.textinput_wrapper}>
-          <TextInput
-            value={address}
-            onChangeText={text => setAddress(text)}
-            placeholder="주소를 입력해주세요."
-            style={styles.textinput}
-            onSubmitEditing={() => searchAddress(address)}
-            returnKeyType="done"
-          />
-        </View>
-      </View>
-      <View style={{width: '100%', height: '100%'}}>
+      {/* NaverMapView를 TextInput과 같은 레벨의 View로 이동 */}
+        <View style={styles.mapViewContainer}>
         <NaverMapView
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
+        style={styles.mapView}
+        ref={mapRef}
+        showsMyLocationButton={true}
+        center={{...location, zoom: 16}}>
+        <Marker
           ref={mapRef}
-          showsMyLocationButton={true}
-          center={{...location, zoom: 16}}>
-          <Marker
-            ref={mapRef}
-            coordinate={location}
-            pinColor="blue"
-            onClick={() => console.log('onClick! p1')}
-          />
-        </NaverMapView>
+          coordinate={location}
+          pinColor="blue"
+          onClick={() => console.log('onClick! p1')}
+        />
+      </NaverMapView>
+        </View>
+
+      {/* TextInput을 절대 위치로 지정하여 Map 위에 위치하도록 함 */}
+      <View style={styles.textinput_wrapper}>
+        <TextInput
+          value={address}
+          onChangeText={text => setAddress(text)}
+          placeholder="주소를 입력해주세요."
+          style={styles.textinput}
+          onSubmitEditing={() => searchAddress(address)}
+          returnKeyType="done"
+        />
       </View>
     </SafeAreaView>
   );
@@ -118,18 +116,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
-  wrapper: {
+  mapViewContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 30,
+  },
+  mapView: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
   textinput_wrapper: {
-    width: '100%',
+    position: 'absolute', // 절대 위치 사용
+    top: Platform.OS === 'android' ? 10 : 50, // android 같은 경우 10, iOS 같은 경우 70
+    left: 10, // 왼쪽에서 10의 여백을 줌
+    right: 10, // 오른쪽에서 10의 여백을 줌
     height: 40,
     borderWidth: 1,
     borderRadius: 10,
-    margin: 10,
+    backgroundColor: 'white', // 배경색 지정
     padding: 10,
   },
   textinput: {
