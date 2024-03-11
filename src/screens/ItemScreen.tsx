@@ -1,4 +1,3 @@
-import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { SafeAreaView, Text, View } from 'react-native';
@@ -13,24 +12,24 @@ const ItemScreen = ({route}) => {
   const P2 = {latitude: 37.565383, longitude: 126.976292};
 
   const navigation = useNavigation();
-  const userCollection = firestore().collection('profile');
+  // const userCollection = firestore().collection('profile');
 
-  const addItem = (item: any, user: any) => {
-    try {
-      userCollection
-        .doc(user.uid)
-        .set({user: user.displayName, text: item.title})
-        .then(res => {
-          console.log('res: ', res);
-          navigation.goBack();
-        })
-        .catch(err => {
-          console.log('err: ', err);
-        });
-    } catch (error) {
-      console.log('error: ', error);
-    }
-  };
+  // const addItem = (item: any, user: any) => {
+  //   try {
+  //     userCollection
+  //       .doc(user.uid)
+  //       .set({user: user.displayName, text: item.title})
+  //       .then(res => {
+  //         console.log('res: ', res);
+  //         navigation.goBack();
+  //       })
+  //       .catch(err => {
+  //         console.log('err: ', err);
+  //       });
+  //   } catch (error) {
+  //     console.log('error: ', error);
+  //   }
+  // };
 
   // Views
   return (

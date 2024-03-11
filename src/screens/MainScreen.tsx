@@ -10,7 +10,6 @@ import NaverMapView, { Marker } from 'react-native-nmap';
 const MainScreen = () => {
   // Logic
   const navigation = useNavigation();
-  const userCollection = firestore().collection('users');
 
   const [user, setUser] = useState();
   const [initializing, setInitializing] = useState(true);
@@ -27,15 +26,11 @@ const MainScreen = () => {
 
   const searchAddress = async (address: string) => {
     try {
-      const apiURL = API_URL;
-      const clientID = NAVER_MAP_API_KEY_ID;
-      const clientSecret = NAVER_MAP_API_SECRET;
-
       await axios
-        .get(apiURL, {
+        .get(API_URL, {
           headers: {
-            'X-NCP-APIGW-API-KEY-ID': clientID,
-            'X-NCP-APIGW-API-KEY': clientSecret,
+            'X-NCP-APIGW-API-KEY-ID': NAVER_MAP_API_KEY_ID,
+            'X-NCP-APIGW-API-KEY': NAVER_MAP_API_SECRET,
           },
           params: {
             query: address,
@@ -47,12 +42,29 @@ const MainScreen = () => {
           const longitude = parseFloat(result.data.addresses[0].x);
           setLocation({latitude, longitude});
           mapRef.current.animateToCoordinate({latitude, longitude});
+          addItem(user, {latitude, longitude});
         })
         .catch(err => {
           console.log(err);
         });
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const addItem = (user: any, location: { latitude: number; longitude: number; }) => {
+    try {
+      firestore().collection('profile')
+        .doc(user.uid)
+        .set({user: user.displayName, text: location})
+        .then(res => {
+          console.log('res: ', res);
+        })
+        .catch(err => {
+          console.log('err: ', err);
+        });
+    } catch (error) {
+      console.log('error: ', error);
     }
   };
 

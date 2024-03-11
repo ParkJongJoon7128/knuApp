@@ -47,7 +47,7 @@ const RegisterScreen = () => {
         .then(result => {
           const {uid} = result.user;
           firebase.auth().currentUser?.updateProfile({displayName});
-          userCollection.doc(uid).set({
+          firestore().collection('users').doc(uid).set({
             date_created: moment().utc().format(),
             uid,
             name,
