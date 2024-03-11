@@ -2,7 +2,7 @@ import { firebase } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Alert,
   SafeAreaView,
@@ -16,11 +16,26 @@ import {
 const RegisterScreen = () => {
   // Logic
   const navigation = useNavigation();
+  const userCollection = firestore().collection('users');
+
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const userCollection = firestore().collection('users');
+  const emailRef = useRef(null);
+  const pwRef = useRef(null);
+
+  const handleEmailSubmit = () => {
+    if (emailRef.current) {
+      emailRef.current.focus();
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    if (pwRef.current) {
+      pwRef.current.focus();
+    }
+  };
 
   const Register = (name: string, email: string, password: string) => {
     if (!name || !email || !password) {
@@ -32,19 +47,17 @@ const RegisterScreen = () => {
         .then(result => {
           const {uid} = result.user;
           firebase.auth().currentUser?.updateProfile({displayName});
-          userCollection
-            .doc(uid)
-            .set({
-              date_created: moment().utc().format(),
-              uid,
-              name,
-              email
-            });
+          userCollection.doc(uid).set({
+            date_created: moment().utc().format(),
+            uid,
+            name,
+            email,
+          });
           setDisplayName('');
           setEmail('');
           setPassword('');
           navigation.navigate('Login');
-          console.log("Register: ", result.user);
+          console.log('Register: ', result.user);
         })
         .catch(err => {
           console.log(err.message);
@@ -66,6 +79,8 @@ const RegisterScreen = () => {
             value={displayName}
             placeholder="NickName"
             style={styles.textinput}
+            onSubmitEditing={handleEmailSubmit}
+            returnKeyType="next"
           />
         </View>
 
@@ -75,6 +90,9 @@ const RegisterScreen = () => {
             value={email}
             placeholder="Email"
             style={styles.textinput}
+            ref={emailRef}
+            onSubmitEditing={handlePasswordSubmit}
+            returnKeyType="next"
           />
         </View>
 
@@ -85,6 +103,8 @@ const RegisterScreen = () => {
             placeholder="PassWord"
             secureTextEntry={true}
             style={styles.textinput}
+            ref={pwRef}
+            onSubmitEditing={() => Register(displayName, email, password)}
           />
         </View>
 

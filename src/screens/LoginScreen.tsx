@@ -1,6 +1,6 @@
 import { firebase } from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Alert,
   SafeAreaView,
@@ -14,8 +14,21 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 const LoginScreen = () => {
   // Logic
   const navigation = useNavigation();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  const inputRef = useRef(null);
+
+  const handleEmailSubmit = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    Login(email, password);
+  };
 
   const Login = (email: string, password: string) => {
     if (!email || !password) {
@@ -55,6 +68,8 @@ const LoginScreen = () => {
             value={email}
             placeholder="Email"
             style={styles.textinput}
+            onSubmitEditing={handleEmailSubmit}
+            returnKeyType='next'
           />
         </View>
         <View style={styles.textinput_wrapper}>
@@ -64,6 +79,9 @@ const LoginScreen = () => {
             placeholder="PassWord"
             secureTextEntry={true}
             style={styles.textinput}
+            onSubmitEditing={handlePasswordSubmit}
+            ref={inputRef}
+            returnKeyType='done'
           />
         </View>
 
@@ -132,18 +150,18 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   login_button_text: {
-    color: '#fff'
+    color: '#fff',
   },
   register_button_wrapper: {
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   register_button: {
     margin: 10,
   },
   register_button_text: {
-    color: '#11998e'
-  }
+    color: '#11998e',
+  },
 });
 
 export default LoginScreen;

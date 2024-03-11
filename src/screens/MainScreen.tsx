@@ -1,28 +1,22 @@
 import { API_URL, NAVER_MAP_API_KEY_ID, NAVER_MAP_API_SECRET } from '@env';
-import { firebase } from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import firestore, { firebase } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { SafeAreaView, StyleSheet, TextInput, View } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
+import NaverMapView, { Marker } from 'react-native-nmap';
 
 const MainScreen = () => {
   // Logic
   const navigation = useNavigation();
-  const [address, setAddress] = useState('');
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
-  // const [filterData, setFilterData] = useState([]);
-  // const [masterData, setMasterData] = useState([]);
-
   const userCollection = firestore().collection('users');
+
+  const [user, setUser] = useState();
+  const [initializing, setInitializing] = useState(true);
+  const [address, setAddress] = useState('');
+  const [location, setLocation] = useState({latitude: 0, longitude: 0});
+  const mapRef = useRef<any>(null);
 
   const onAuthStateChanged = (user: any) => {
     setUser(user);
@@ -31,155 +25,57 @@ const MainScreen = () => {
     }
   };
 
-  const LogOut = () => {
-    return firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        console.log('Logout');
-        navigation.navigate('Login');
-      })
-      .catch(err => {
-        console.log(err.message);
-      });
-  };
-
-  const Delete = () => {
-    const user = firebase.auth().currentUser;
-    if (user) {
-      try {
-        return firebase
-          .auth()
-          .currentUser?.delete()
-          .then(() => {
-            console.log('Logout');
-            userCollection.doc(user?.uid).delete();
-            navigation.navigate('Login');
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
-
-  // const searchAddress = async (address: string) => {
-  //   try {
-  //     const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
-  //       method: 'POST',
-  //       body: JSON.stringify({
-  //         "address": address
-  //       })
-  //     });
-  //     const resultJSON = await response.json();
-  //     setAddress(resultJSON);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // await axios
-  //   .get(apiURL, {
-  //     params: {
-  //       query: address,
-  //     },
-  //     headers: {
-  //       'X-NCP-APIGW-API-KEY-ID': apiKeyID,
-  //       'X-NCP-APIGW-API-KEY': apiKey,
-  //     },
-  //   })
-  //   .then(res => console.log(res.data))
-  //   .catch(err => {
-  //     console.log(err);
-  //   });
-
   const searchAddress = async (address: string) => {
     try {
       const apiURL = API_URL;
       const clientID = NAVER_MAP_API_KEY_ID;
       const clientSecret = NAVER_MAP_API_SECRET;
 
-      const response = await axios.get(apiURL, {
-        headers: {
-          'X-NCP-APIGW-API-KEY-ID': clientID,
-          'X-NCP-APIGW-API-KEY': clientSecret,
-        },
-        params: {
-          query: address,
-        },
-      });
-      console.log(response.data);
+      await axios
+        .get(apiURL, {
+          headers: {
+            'X-NCP-APIGW-API-KEY-ID': clientID,
+            'X-NCP-APIGW-API-KEY': clientSecret,
+          },
+          params: {
+            query: address,
+          },
+        })
+        .then(result => {
+          console.log(result.data);
+          const latitude = parseFloat(result.data.addresses[0].y);
+          const longitude = parseFloat(result.data.addresses[0].x);
+          setLocation({latitude, longitude});
+          mapRef.current.animateToCoordinate({latitude, longitude});
+        })
+        .catch(err => {
+          console.log(err);
+        });
     } catch (error) {
       console.log(error);
     }
   };
 
-  // const test = async () => {
-  //   try {
-  //     const apiURL = 'https://jsonplaceholder.typicode.com/posts';
-  //     fetch(apiURL)
-  //       .then(res => res.json())
-  //       .then(resJson => {
-  //         setFilterData(resJson);
-  //         setMasterData(resJson);
-  //       })
-  //       .catch(err => {
-  //         console.log('err: ', err);
-  //       });
-  //   } catch (error) {
-  //     console.log('error: ', error);
-  //   }
-  // };
-
-  // const searchFilter = text => {
-  //   if (text) {
-  //     const newData = masterData.filter(item => {
-  //       const itemData = item.title ? item.title : '';
-  //       const textData = text;
-  //       return itemData.indexOf(textData) > -1;
-  //     });
-  //     setFilterData(newData);
-  //     setAddress(text);
-  //   } else {
-  //     setFilterData(masterData);
-  //     setAddress(text);
-  //   }
-  // };
-
   useEffect(() => {
-    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log('현재위치: ', position.coords);
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        setLocation({latitude, longitude});
+        mapRef.current.animateToCoordinate({latitude, longitude});
+      },
+      error => {
+        console.log(error);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+    return firebase.auth().onAuthStateChanged(onAuthStateChanged);
   }, []);
-
-  // useEffect(() => {
-  //   searchAddress();
-  // }, []);
 
   if (initializing) {
     return null;
   }
-
-  // const renderItem = ({item}) => {
-  //   return (
-  //     <View
-  //       style={{
-  //         flex: 1,
-  //         padding: 10,
-  //       }}>
-  //       <TouchableOpacity
-  //         onPress={() => {
-  //           navigation.navigate('Item', {item: item, user: user});
-  //         }}>
-  //         <Text style={{alignSelf: 'flex-start'}}>{item.title}</Text>
-  //       </TouchableOpacity>
-  //     </View>
-  //   );
-  // };
-
-  // const ItemSeparatorView = () => {
-  //   return (
-  //     <View style={{height: 0.5, width: '100%', backgroundColor: '#c8c8c8'}} />
-  //   );
-  // };
 
   // Views
   return (
@@ -191,53 +87,27 @@ const MainScreen = () => {
             onChangeText={text => setAddress(text)}
             placeholder="주소를 입력해주세요."
             style={styles.textinput}
+            onSubmitEditing={() => searchAddress(address)}
+            returnKeyType="done"
           />
         </View>
-
-        <View
+      </View>
+      <View style={{width: '100%', height: '100%'}}>
+        <NaverMapView
           style={{
-            margin: 10,
-            padding: 10,
-            backgroundColor: 'yellow',
             width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity onPress={() => searchAddress(address)}>
-            <Text>검색</Text>
-          </TouchableOpacity>
-        </View>
-        <View>
-          {/* <FlatList
-            data={filterData}
-            keyExtractor={(item, index) => index.toString()}
-            ItemSeparatorComponent={ItemSeparatorView}
-            renderItem={renderItem}
-          /> */}
-        </View>
-
-        {/* <View style={{alignSelf: 'flex-start'}}>
-          <Text>uid: {user?.uid}</Text>
-        </View>
-
-        <View style={{alignSelf: 'flex-start'}}>
-          <Text>displayName: {user?.displayName}</Text>
-        </View>
-        <View style={{alignSelf: 'flex-start'}}>
-          <Text>email: {user?.email}</Text>
-        </View>
-
-        <TouchableOpacity
-          style={{padding: 10, margin: 10}}
-          onPress={() => LogOut()}>
-          <Text>Logout</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{padding: 10, margin: 10}}
-          onPress={() => Delete()}>
-          <Text>회원 탈퇴</Text>
-        </TouchableOpacity> */}
+            height: '100%',
+          }}
+          ref={mapRef}
+          showsMyLocationButton={true}
+          center={{...location, zoom: 16}}>
+          <Marker
+            ref={mapRef}
+            coordinate={location}
+            pinColor="blue"
+            onClick={() => console.log('onClick! p1')}
+          />
+        </NaverMapView>
       </View>
     </SafeAreaView>
   );

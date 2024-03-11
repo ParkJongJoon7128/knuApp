@@ -7,16 +7,30 @@
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { PermissionsAndroid, Platform } from 'react-native';
+import Geolocation from 'react-native-geolocation-service';
 import ItemScreen from './src/screens/ItemScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import MainScreen from './src/screens/MainScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 
+
 const Stack = createStackNavigator();
 
 function App(): React.JSX.Element {
   // Logic
+  useEffect(() => {
+    if (Platform.OS === 'android'){
+        PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        )
+    }
+
+    if(Platform.OS === 'ios'){
+      Geolocation.requestAuthorization("always");
+    }
+}, []);
 
   // Views
   return (
