@@ -1681,7 +1681,7 @@
     prompts "^2.4.2"
     semver "^7.5.2"
 
-"@react-native-firebase/app@^19.0.0", "@react-native-firebase/app@19.0.0":
+"@react-native-firebase/app@^19.0.0", "@react-native-firebase/app@19.0.0", "@react-native-firebase/app@19.0.1":
   version "19.0.0"
   resolved "https://registry.npmjs.org/@react-native-firebase/app/-/app-19.0.0.tgz"
   integrity sha512-QcT4fJQjoEmvmRKDiEsLf5MBAgejlBGCAuAgXT/TBxE8/lrLubhlHVokodQvP0trjcVoA8L+HSEQFX2eIc3BPA==
@@ -1695,6 +1695,11 @@
   integrity sha512-ekpVuo+TwBr+9PVmRww/03tp3u2EzJBOLvfm5jihBvijYENjgrLQTULroeoY+VXyRC2Du34HcXHFlXx1yvxqgw==
   dependencies:
     plist "^3.1.0"
+
+"@react-native-firebase/database@^19.0.1":
+  version "19.0.1"
+  resolved "https://registry.npmjs.org/@react-native-firebase/database/-/database-19.0.1.tgz"
+  integrity sha512-/JycxN/aslFj5UR75lFSM4mLr6kzNqONS7jKpId03i5R/j+9FWgHc3bD8suX+eM291qsmP9gePT0CRIsN7WxAA==
 
 "@react-native-firebase/firestore@^19.0.0":
   version "19.0.0"

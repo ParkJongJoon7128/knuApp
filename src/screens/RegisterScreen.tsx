@@ -1,4 +1,5 @@
 import { firebase } from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
@@ -47,12 +48,17 @@ const RegisterScreen = () => {
         .then(result => {
           const {uid} = result.user;
           firebase.auth().currentUser?.updateProfile({displayName});
-          firestore().collection('users').doc(uid).set({
+          database().ref("users/").child(uid).set({
             date_created: moment().utc().format(),
-            uid,
-            name,
-            email,
+            NickName: name,
+            email
           });
+          // firestore().collection('users').doc(uid).set({
+          //   date_created: moment().utc().format(),
+          //   uid,
+          //   name,
+          //   email,
+          // });
           setDisplayName('');
           setEmail('');
           setPassword('');

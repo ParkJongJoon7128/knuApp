@@ -1,9 +1,16 @@
 import { API_URL, NAVER_MAP_API_KEY_ID, NAVER_MAP_API_SECRET } from '@env';
-import firestore, { firebase } from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
+import { firebase } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native';
+import {
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import NaverMapView, { Marker } from 'react-native-nmap';
 
@@ -37,7 +44,7 @@ const MainScreen = () => {
           },
         })
         .then(result => {
-          console.log(result.data);
+          // console.log(result.data);
           const latitude = parseFloat(result.data.addresses[0].y);
           const longitude = parseFloat(result.data.addresses[0].x);
           setLocation({latitude, longitude});
@@ -52,16 +59,32 @@ const MainScreen = () => {
     }
   };
 
-  const addItem = (user: any, location: { latitude: number; longitude: number; }) => {
+  const addItem = (
+    user: any,
+    location: {latitude: number; longitude: number},
+  ) => {
     try {
-      firestore().collection('profile')
-        .doc(user.uid)
-        .set({user: user.displayName, text: location})
+      // firestore().collection('profile')
+      //   .doc(user.uid)
+      //   .set({user: user.displayName, text: location})
+      //   .then(res => {
+      //     console.log('res: ', res);
+      //   })
+      //   .catch(err => {
+      //     console.log('err: ', err);
+      //   });
+      database()
+        .ref('locations/')
+        .child(user.uid)
+        .set({
+          address,
+          location,
+        })
         .then(res => {
           console.log('res: ', res);
         })
-        .catch(err => {
-          console.log('err: ', err);
+        .catch(res => {
+          console.log('res: ', res);
         });
     } catch (error) {
       console.log('error: ', error);
@@ -71,7 +94,7 @@ const MainScreen = () => {
   useEffect(() => {
     Geolocation.getCurrentPosition(
       position => {
-        console.log('현재위치: ', position.coords);
+        // console.log('현재위치: ', position.coords);
         const latitude = position.coords.latitude;
         const longitude = position.coords.longitude;
         setLocation({latitude, longitude});
@@ -93,20 +116,20 @@ const MainScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* NaverMapView를 TextInput과 같은 레벨의 View로 이동 */}
-        <View style={styles.mapViewContainer}>
+      <View style={styles.mapViewContainer}>
         <NaverMapView
-        style={styles.mapView}
-        ref={mapRef}
-        showsMyLocationButton={true}
-        center={{...location, zoom: 16}}>
-        <Marker
+          style={styles.mapView}
           ref={mapRef}
-          coordinate={location}
-          pinColor="blue"
-          onClick={() => console.log('onClick! p1')}
-        />
-      </NaverMapView>
-        </View>
+          showsMyLocationButton={true}
+          center={{...location, zoom: 16}}>
+          <Marker
+            ref={mapRef}
+            coordinate={location}
+            pinColor="blue"
+            onClick={() => console.log('onClick! p1')}
+          />
+        </NaverMapView>
+      </View>
 
       {/* TextInput을 절대 위치로 지정하여 Map 위에 위치하도록 함 */}
       <View style={styles.textinput_wrapper}>
