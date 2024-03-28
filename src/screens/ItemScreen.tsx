@@ -11,7 +11,7 @@ const ItemScreen = ({route}) => {
   const P1 = {latitude: 37.565051, longitude: 126.978567};
   const P2 = {latitude: 37.565383, longitude: 126.976292};
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<ROOT_NAVIGATION>();
   // const userCollection = firestore().collection('profile');
 
   // const addItem = (item: any, user: any) => {

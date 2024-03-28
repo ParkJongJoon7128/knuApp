@@ -16,7 +16,7 @@ import {
 
 const RegisterScreen = () => {
   // Logic
-  const navigation = useNavigation();
+  const navigation = useNavigation<ROOT_NAVIGATION>();
   const userCollection = firestore().collection('users');
 
   const [displayName, setDisplayName] = useState('');

@@ -1873,6 +1873,11 @@ PODS:
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
+  - RNReanimated (3.8.1):
+    - glog
+    - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+    - ReactCommon/turbomodule/core
   - RNScreens (3.29.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1941,6 +1946,7 @@ DEPENDENCIES:
   - "RNFBDatabase (from `../node_modules/@react-native-firebase/database`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -2084,6 +2090,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/firestore"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNReanimated:
+    :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   Yoga:
@@ -2169,6 +2177,7 @@ SPEC CHECKSUMS:
   RNFBDatabase: fcc821c15aca9d75580a2185d36802758e9bc2ae
   RNFBFirestore: 866cbb84f3e6e48e8006bc03107355ec69633ed0
   RNGestureHandler: 7feb85c5a30ebbcd4d5c7a851ba9e7eafb9860cb
+  RNReanimated: 8c009e95ed82289b412801b9fc220dca24455f8d
   RNScreens: 2b73f5eb2ac5d94fbd61fa4be0bfebd345716825
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 64cd2a583ead952b0315d5135bf39e053ae9be70

@@ -13,7 +13,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const LoginScreen = () => {
   // Logic
-  const navigation = useNavigation();
+  const navigation = useNavigation<ROOT_NAVIGATION>();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,7 +46,7 @@ const LoginScreen = () => {
           );
           setEmail('');
           setPassword('');
-          navigation.navigate('Main');
+          navigation.navigate('Main', {uid: result.user.uid});
         })
         .catch(err => {
           console.log(err.message);

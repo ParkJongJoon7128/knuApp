@@ -12,5 +12,6 @@ module.exports = {
         allowUndefined: true,
       },
     ],
+    ['react-native-reanimated/plugin'], // 플러그인 추가
   ],
 };
