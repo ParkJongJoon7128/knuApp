@@ -131,7 +131,8 @@ const MainScreen = ({route}) => {
 
   const ItemView = ({item}) => {
     const handleItemPress = () => {
-      setLocation({latitude: item.latitude, longitude: item.longitude})
+      setLocation({latitude: item.latitude, longitude: item.longitude});
+      setAddress(item.place_name);
       setFocus(false);
     }
     return (
