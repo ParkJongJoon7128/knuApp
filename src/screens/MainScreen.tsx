@@ -1,25 +1,29 @@
 import { API_URL, KAKAO_REST_API_KEY } from '@env';
 import database from '@react-native-firebase/database';
 import { firebase } from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  FlatList,
   Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import NaverMapView from 'react-native-nmap';
 import { useRecoilState } from 'recoil';
 import { locationState, userState } from '../data/dataState';
 
-
 const MainScreen = ({route}) => {
   // Logic
+  const navigation =
+    useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
   const {uid} = route.params;
 
   const [user, setUser] = useState<any>();
@@ -29,6 +33,10 @@ const MainScreen = ({route}) => {
   const [location, setLocation] = useState({latitude: 0, longitude: 0});
   const [locationList, setLocationList] = useRecoilState(locationState);
   const [userList, setUserList] = useRecoilState(userState);
+  const [filterData, setFilterData] = useState([]);
+  const [masterData, setMasterData] = useState([]);
+  const [focus, setFocus] = useState(false);
+
   const mapRef = useRef<any>(null);
 
   const onAuthStateChanged = (user) => {
@@ -52,14 +60,30 @@ const MainScreen = ({route}) => {
         })
         .then(result => {
           console.log('검색 결과: ', result.data.documents);
-          setLocationList(result.data.documents.map(data=> ({
-            address_name: data.address_name,
-            category_group_name: data.category_group_name,
-            phone_number: data.phone,
-            place_name: data.place_name,
-            latitude: parseFloat(data.y),
-            longitude: parseFloat(data.x),
-          })));
+          setFilterData(
+            result.data.documents.map(data => ({
+              place_name: data.place_name,
+              latitude: parseFloat(data.y),
+              longitude: parseFloat(data.x),
+            })),
+          );
+          setMasterData(
+            result.data.documents.map(data => ({
+              place_name: data.place_name,
+              latitude: parseFloat(data.y),
+              longitude: parseFloat(data.x),
+            })),
+          );
+          setLocationList(
+            result.data.documents.map(data => ({
+              address_name: data.address_name,
+              category_group_name: data.category_group_name,
+              phone_number: data.phone,
+              place_name: data.place_name,
+              latitude: parseFloat(data.y),
+              longitude: parseFloat(data.x),
+            })),
+          );
         })
         .catch(err => {
           console.log('주소 검색 실패: ', err);
@@ -89,7 +113,7 @@ const MainScreen = ({route}) => {
   useEffect(() => {
     console.log('locationState: ', locationList);
     console.log('userState: ', userList);
-  });
+  }, []);
 
   useEffect(() => {
     database()
@@ -105,37 +129,90 @@ const MainScreen = ({route}) => {
       });
   }, []);
 
+  const ItemView = ({item}) => {
+    const handleItemPress = () => {
+      setLocation({latitude: item.latitude, longitude: item.longitude})
+      setFocus(false);
+    }
+    return (
+      <TouchableOpacity
+        onPress={handleItemPress}>
+        <View style={{padding: 10}}>
+          <Text>{item.place_name}</Text>
+          <View style={{marginTop: 10}}>
+            <Text>위도: {item.latitude.toString()}</Text>
+            <Text>경도: {item.longitude.toString()}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  
+
+  const ItemSeparatorView = () => {
+    return (
+      <View
+        style={{height: 0.5, width: '100%', backgroundColor: '#c8c8c8'}}></View>
+    );
+  };
+
   if (initializing) {
     return null;
   }
+
+  const searchFilter = (text: string) => {
+    if (text) {
+      const newData = masterData.filter(item => {
+        const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilterData(newData);
+      setAddress(text);
+    } else {
+      setFilterData(masterData);
+      setAddress(text);
+    }
+  };
 
   // Views
   return (
     <SafeAreaView style={styles.container}>
       {/* NaverMapView를 TextInput과 같은 레벨의 View로 이동 */}
       <View style={styles.mapViewContainer}>
+        {focus ? (
+          <FlatList
+            data={filterData}
+            keyExtractor={(item, index) => index.toString()}
+            ItemSeparatorComponent={ItemSeparatorView}
+            renderItem={ItemView}
+          />
+        ) : (
           <NaverMapView
             style={styles.mapView}
             ref={mapRef}
             showsMyLocationButton={true}
-            center={{...location, zoom: 16}} />
-        </View>
+            center={{...location, zoom: 16}}
+          />
+        )}
+      </View>
 
       {/* TextInput을 절대 위치로 지정하여 Map 위에 위치하도록 함 */}
       <View style={styles.search_wrapper}>
         <View style={styles.textInputContainer}>
           <TextInput
             value={address}
-            onChangeText={text => setAddress(text)}
+            // onChangeText={text => setAddress(text)}
+            onChangeText={text => searchFilter(text)}
             placeholder="주소를 입력해주세요."
             style={styles.textinput}
             onSubmitEditing={searchAddress}
             returnKeyType="done"
+            onFocus={e => setFocus(!!e)}
+            underlineColorAndroid="transparent"
           />
         </View>
-        <TouchableOpacity
-          style={styles.searchButton}
-          onPress={searchAddress}>
+        <TouchableOpacity style={styles.searchButton} onPress={searchAddress}>
           <Text style={styles.buttonText}>검색</Text>
         </TouchableOpacity>
       </View>
@@ -150,8 +227,9 @@ const styles = StyleSheet.create({
   },
   mapViewContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: Platform.OS === 'android' ? 60 : 40,
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   mapView: {
     position: 'absolute',

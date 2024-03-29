@@ -3,8 +3,8 @@ export interface LocationType {
   category_group_name?: string;
   phone_number?: string;
   place_name?: string;
-  latitude: string;
-  longitude: string;
+  latitude?: string;
+  longitude?: string;
 }
 
 export interface UserType {
