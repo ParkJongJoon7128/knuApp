@@ -1,10 +1,11 @@
 import { API_URL, KAKAO_REST_API_KEY } from '@env';
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
 import database from '@react-native-firebase/database';
 import { firebase } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Platform,
@@ -18,7 +19,7 @@ import {
 import Geolocation from 'react-native-geolocation-service';
 import NaverMapView from 'react-native-nmap';
 import { useRecoilState } from 'recoil';
-import { locationState, userState } from '../data/dataState';
+import { BottomSheetDataState, locationState, userState } from '../data/dataState';
 
 const MainScreen = ({route}) => {
   // Logic
@@ -33,11 +34,17 @@ const MainScreen = ({route}) => {
   const [location, setLocation] = useState({latitude: 0, longitude: 0});
   const [locationList, setLocationList] = useRecoilState(locationState);
   const [userList, setUserList] = useRecoilState(userState);
+  const [bottomSheetList, setBottomSheetList] = useRecoilState(BottomSheetDataState);
   const [filterData, setFilterData] = useState([]);
   const [masterData, setMasterData] = useState([]);
   const [focus, setFocus] = useState(false);
+  // const [selectedItem, setSelectedItem] = useState(null);
 
-  const mapRef = useRef<any>(null);
+
+  const mapRef = useRef<NaverMapView>(null);
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  const snapPoints = useMemo(() => ['25%', '65%'], []);
 
   const onAuthStateChanged = (user) => {
     setUser(user);
@@ -45,6 +52,27 @@ const MainScreen = ({route}) => {
       setInitializing(false);
     }
   };
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+
+  const handleSheetBackdrop = useCallback(
+    (props: any) => <BottomSheetBackdrop {...props} pressBehavior="close" />,
+    [],
+  );
+
+  const handleItemPress = (item: any) => {
+    setLocation({latitude: item.latitude, longitude: item.longitude});
+    setAddress(item.place_name);
+    setBottomSheetList(item);
+    setFocus(false);
+    handlePresentModalPress();
+  }
 
   const searchAddress = async () => {
     try {
@@ -130,14 +158,9 @@ const MainScreen = ({route}) => {
   }, []);
 
   const ItemView = ({item}) => {
-    const handleItemPress = () => {
-      setLocation({latitude: item.latitude, longitude: item.longitude});
-      setAddress(item.place_name);
-      setFocus(false);
-    }
     return (
       <TouchableOpacity
-        onPress={handleItemPress}>
+        onPress={() => handleItemPress(item)}>
         <View style={{padding: 10}}>
           <Text>{item.place_name}</Text>
           <View style={{marginTop: 10}}>
@@ -179,44 +202,87 @@ const MainScreen = ({route}) => {
   // Views
   return (
     <SafeAreaView style={styles.container}>
-      {/* NaverMapView를 TextInput과 같은 레벨의 View로 이동 */}
-      <View style={styles.mapViewContainer}>
-        {focus ? (
-          <FlatList
-            data={filterData}
-            keyExtractor={(item, index) => index.toString()}
-            ItemSeparatorComponent={ItemSeparatorView}
-            renderItem={ItemView}
-          />
-        ) : (
-          <NaverMapView
-            style={styles.mapView}
-            ref={mapRef}
-            showsMyLocationButton={true}
-            center={{...location, zoom: 16}}
-          />
-        )}
-      </View>
-
-      {/* TextInput을 절대 위치로 지정하여 Map 위에 위치하도록 함 */}
-      <View style={styles.search_wrapper}>
-        <View style={styles.textInputContainer}>
-          <TextInput
-            value={address}
-            // onChangeText={text => setAddress(text)}
-            onChangeText={text => searchFilter(text)}
-            placeholder="주소를 입력해주세요."
-            style={styles.textinput}
-            onSubmitEditing={searchAddress}
-            returnKeyType="done"
-            onFocus={e => setFocus(!!e)}
-            underlineColorAndroid="transparent"
-          />
+      <BottomSheetModalProvider>
+        {/* NaverMapView를 TextInput과 같은 레벨의 View로 이동 */}
+        <View style={styles.mapViewContainer}>
+          {focus ? (
+            <FlatList
+              data={filterData}
+              keyExtractor={(item, index) => index.toString()}
+              ItemSeparatorComponent={ItemSeparatorView}
+              renderItem={ItemView}
+            />
+          ) : (
+            <NaverMapView
+              style={styles.mapView}
+              ref={mapRef}
+              showsMyLocationButton={true}
+              center={{...location, zoom: 16}}
+            />
+          )}
         </View>
-        <TouchableOpacity style={styles.searchButton} onPress={searchAddress}>
-          <Text style={styles.buttonText}>검색</Text>
-        </TouchableOpacity>
-      </View>
+
+        {/* TextInput을 절대 위치로 지정하여 Map 위에 위치하도록 함 */}
+        <View style={styles.search_wrapper}>
+          <View style={styles.textInputContainer}>
+            <TextInput
+              value={address}
+              // onChangeText={text => setAddress(text)}
+              onChangeText={text => searchFilter(text)}
+              placeholder="주소를 입력해주세요."
+              style={styles.textinput}
+              onSubmitEditing={searchAddress}
+              returnKeyType="done"
+              onFocus={e => setFocus(!!e)}
+              underlineColorAndroid="transparent"
+            />
+          </View>
+          <TouchableOpacity style={styles.searchButton} onPress={searchAddress}>
+            <Text style={styles.buttonText}>검색</Text>
+          </TouchableOpacity>
+        </View>
+
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          index={1}
+          snapPoints={snapPoints}
+          onChange={handleSheetChanges}
+          backdropComponent={handleSheetBackdrop}>
+          <BottomSheetView>
+            {bottomSheetList && (
+              <View style={{padding: 10}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+                      {bottomSheetList.place_name}
+                    </Text>
+                    <TouchableOpacity style={styles.bottomSheetAddButton}>
+                      <Text style={{color: 'white'}}>추가</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View>
+                  <Text>위도: {bottomSheetList.latitude}</Text>
+                  <Text>경도: {bottomSheetList.longitude}</Text>
+                </View>
+                {/* <View style={{marginTop: 30}}>
+                  <Text>주소: {bottomSheetList.address_name}</Text>
+                </View> */}
+              </View>
+            )}
+          </BottomSheetView>
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
     </SafeAreaView>
   );
 };
@@ -275,6 +341,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     includeFontPadding: false,
   },
+  bottomSheetAddButton: {
+    backgroundColor: '#1581ec',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 25,
+  }
 });
 
 export default MainScreen;

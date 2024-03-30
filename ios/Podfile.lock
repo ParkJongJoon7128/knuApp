@@ -1869,7 +1869,7 @@ PODS:
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - React-Core
     - RNFBApp
-  - RNGestureHandler (2.15.0):
+  - RNGestureHandler (2.16.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -2176,7 +2176,7 @@ SPEC CHECKSUMS:
   RNFBAuth: f5ee3b29bcf9c4c53bca6352c1cd3d3f8a64838e
   RNFBDatabase: fcc821c15aca9d75580a2185d36802758e9bc2ae
   RNFBFirestore: 866cbb84f3e6e48e8006bc03107355ec69633ed0
-  RNGestureHandler: 7feb85c5a30ebbcd4d5c7a851ba9e7eafb9860cb
+  RNGestureHandler: fdcd620c0e90c3d80612dd994e8518a8866ed34b
   RNReanimated: 8c009e95ed82289b412801b9fc220dca24455f8d
   RNScreens: 2b73f5eb2ac5d94fbd61fa4be0bfebd345716825
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
@@ -2184,4 +2184,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: c1663c6c18aaf10dd8c41b26c84eed1fc37e48cf
 
-COCOAPODS: 1.13.0
+COCOAPODS: 1.15.2
