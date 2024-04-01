@@ -91,6 +91,8 @@ const MainScreen = ({route}) => {
           setFilterData(
             result.data.documents.map(data => ({
               place_name: data.place_name,
+              address_name: data.address_name,
+              category_group_name: data.category_group_name,
               latitude: parseFloat(data.y),
               longitude: parseFloat(data.x),
             })),
@@ -98,6 +100,8 @@ const MainScreen = ({route}) => {
           setMasterData(
             result.data.documents.map(data => ({
               place_name: data.place_name,
+              address_name: data.address_name,
+              category_group_name: data.category_group_name,
               latitude: parseFloat(data.y),
               longitude: parseFloat(data.x),
             })),
@@ -266,18 +270,68 @@ const MainScreen = ({route}) => {
                     <Text style={{fontSize: 18, fontWeight: 'bold'}}>
                       {bottomSheetList.place_name}
                     </Text>
-                    <TouchableOpacity style={styles.bottomSheetAddButton}>
+                    <View style={{marginTop: 10}}>
+                      <Text>{bottomSheetList.address_name}</Text>
+                    </View>
+                    {bottomSheetList.category_group_name ? (
+                      <View
+                        style={{
+                          borderRadius: 15,
+                          borderWidth: 1,
+                          borderColor: '#c5c6c7',
+                          paddingHorizontal: 15,
+                          paddingVertical: 5,
+                          marginTop: 10,
+                        }}>
+                        <Text style={{color: '#8b8c8c'}}>
+                          {bottomSheetList.category_group_name}
+                        </Text>
+                      </View>
+                    ) : (
+                      <></>
+                    )}
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignSelf: 'flex-start',
+                      }}>
+                      <Text>평점</Text>
+                    </View>
+
+                    <View
+                      style={{
+                        height: 0.5,
+                        width: '100%',
+                        backgroundColor: '#c8c8c8',
+                        marginTop: 50,
+                        marginBottom: 50,
+                      }}
+                    />
+
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignSelf: 'flex-start',
+                      }}>
+                      <Text>리뷰</Text>
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.bottomSheetAddButton}
+                      onPress={() =>
+                        navigation.navigate('Review', {
+                          uid: uid,
+                          location: location,
+                          place_name: bottomSheetList.place_name,
+                          address_name: bottomSheetList.address_name,
+                          category_group_name: bottomSheetList.category_group_name,
+                        })
+                      }>
                       <Text style={{color: 'white'}}>추가</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
-                <View>
-                  <Text>위도: {bottomSheetList.latitude}</Text>
-                  <Text>경도: {bottomSheetList.longitude}</Text>
-                </View>
-                {/* <View style={{marginTop: 30}}>
-                  <Text>주소: {bottomSheetList.address_name}</Text>
-                </View> */}
+                <View>{/* body에 들어갈 부분 */}</View>
               </View>
             )}
           </BottomSheetView>
@@ -349,7 +403,8 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 25,
+    alignSelf: 'flex-end',
+    margin: 10,
   }
 });
 

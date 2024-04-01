@@ -25,11 +25,7 @@ const LoginScreen = () => {
       inputRef.current.focus();
     }
   };
-
-  const handlePasswordSubmit = () => {
-    Login(email, password);
-  };
-
+  
   const Login = (email: string, password: string) => {
     if (!email || !password) {
       Alert.alert('값을 입력해주세요');
@@ -69,7 +65,7 @@ const LoginScreen = () => {
             placeholder="Email"
             style={styles.textinput}
             onSubmitEditing={handleEmailSubmit}
-            returnKeyType='next'
+            returnKeyType="next"
           />
         </View>
         <View style={styles.textinput_wrapper}>
@@ -79,9 +75,9 @@ const LoginScreen = () => {
             placeholder="PassWord"
             secureTextEntry={true}
             style={styles.textinput}
-            onSubmitEditing={handlePasswordSubmit}
+            onSubmitEditing={() => Login(email, password)}
             ref={inputRef}
-            returnKeyType='done'
+            returnKeyType="done"
           />
         </View>
 

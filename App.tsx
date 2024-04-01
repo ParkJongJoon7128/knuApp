@@ -11,10 +11,10 @@ import React, { useEffect } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { RecoilRoot } from 'recoil';
-import ItemScreen from './src/screens/ItemScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import MainScreen from './src/screens/MainScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
+import ReviewScreen from './src/screens/ReviewScreen';
 
 
 const Stack = createStackNavigator();
@@ -56,8 +56,8 @@ function App(): React.JSX.Element {
           />
 
           <Stack.Screen
-            name="Item"
-            component={ItemScreen}
+            name="Review"
+            component={ReviewScreen}
             options={{headerShown: false}}
           />
         </Stack.Navigator>
