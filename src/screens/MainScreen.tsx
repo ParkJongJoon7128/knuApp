@@ -170,16 +170,49 @@ const MainScreen = ({route}) => {
   const SearchItemView = ({item}) => {
     return (
       <TouchableOpacity onPress={() => handleItemPress(item)}>
-        <View style={{padding: 10}}>
-          <Text>{item.place_name}</Text>
-          <View style={{marginTop: 10}}>
-            <Text>위도: {item.latitude.toString()}</Text>
-            <Text>경도: {item.longitude.toString()}</Text>
+        <View style={{flex: 1, paddingVertical: 12, paddingHorizontal: 15}}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <View>
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: 'black',
+                }}>
+                {item.place_name}
+              </Text>
+            </View>
+            <View
+              style={{
+                borderRadius: 15,
+                borderWidth: 1,
+                borderColor: '#d2d2d2',
+                paddingHorizontal: 8,
+                paddingVertical: 3,
+              }}>
+              <Text style={{fontSize: 12, color: '#d2d2d2'}}>
+                {item.category_group_name}
+              </Text>
+            </View>
+          </View>
+          <View
+            style={{
+              marginTop: 5,
+            }}>
+            <Text style={{fontSize: 12, color: '#b2b2b2'}}>
+              {item.address_name}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
     );
   };
+  
   const BottomSheetItemView = useCallback(
     ({item, index}: any) => (
       <TouchableOpacity
