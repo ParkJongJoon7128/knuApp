@@ -1,5 +1,8 @@
 import { API_URL, KAKAO_REST_API_KEY } from '@env';
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider, BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+} from '@gorhom/bottom-sheet';
 import database from '@react-native-firebase/database';
 import { firebase } from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
@@ -17,9 +20,13 @@ import {
   View,
 } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import NaverMapView from 'react-native-nmap';
+import NaverMapView, { Marker } from 'react-native-nmap';
 import { useRecoilState } from 'recoil';
-import { BottomSheetDataState, locationState, userState } from '../data/dataState';
+import {
+  BottomSheetDataState,
+  locationState,
+  userState,
+} from '../data/dataState';
 
 const MainScreen = ({route}) => {
   // Logic
@@ -34,19 +41,18 @@ const MainScreen = ({route}) => {
   const [location, setLocation] = useState({latitude: 0, longitude: 0});
   const [locationList, setLocationList] = useRecoilState(locationState);
   const [userList, setUserList] = useRecoilState(userState);
-  const [bottomSheetList, setBottomSheetList] = useRecoilState(BottomSheetDataState);
+  const [bottomSheetList, setBottomSheetList] =
+    useRecoilState(BottomSheetDataState);
   const [filterData, setFilterData] = useState([]);
   const [masterData, setMasterData] = useState([]);
   const [focus, setFocus] = useState(false);
-  // const [selectedItem, setSelectedItem] = useState(null);
-
 
   const mapRef = useRef<NaverMapView>(null);
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const snapPoints = useMemo(() => ['25%', '65%'], []);
 
-  const onAuthStateChanged = (user) => {
+  const onAuthStateChanged = user => {
     setUser(user);
     if (initializing) {
       setInitializing(false);
@@ -54,7 +60,7 @@ const MainScreen = ({route}) => {
   };
 
   const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
+    bottomSheetRef.current?.expand();
   }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
@@ -72,14 +78,14 @@ const MainScreen = ({route}) => {
     setBottomSheetList(item);
     setFocus(false);
     handlePresentModalPress();
-  }
+  };
 
   const searchAddress = async () => {
     try {
       await axios
         .get(API_URL, {
           headers: {
-            Authorization: KAKAO_REST_API_KEY,
+            Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
           },
           params: {
@@ -143,11 +149,6 @@ const MainScreen = ({route}) => {
   }, []);
 
   useEffect(() => {
-    console.log('locationState: ', locationList);
-    console.log('userState: ', userList);
-  }, []);
-
-  useEffect(() => {
     database()
       .ref('locations/')
       .child(uid)
@@ -161,10 +162,14 @@ const MainScreen = ({route}) => {
       });
   }, []);
 
-  const ItemView = ({item}) => {
+  useEffect(() => {
+    console.log('locationState: ', locationList);
+    console.log('userState: ', userList);
+  }, []);
+
+  const SearchItemView = ({item}) => {
     return (
-      <TouchableOpacity
-        onPress={() => handleItemPress(item)}>
+      <TouchableOpacity onPress={() => handleItemPress(item)}>
         <View style={{padding: 10}}>
           <Text>{item.place_name}</Text>
           <View style={{marginTop: 10}}>
@@ -175,7 +180,107 @@ const MainScreen = ({route}) => {
       </TouchableOpacity>
     );
   };
-  
+  const BottomSheetItemView = useCallback(
+    ({item, index}: any) => (
+      <TouchableOpacity
+        onPress={() => {
+          mapRef.current?.animateToCoordinate({
+            latitude: item.latitude,
+            longitude: item.longitude,
+          });
+          bottomSheetRef.current?.snapToIndex(0);
+        }}>
+        <View style={{padding: 15}} key={index}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+                {item.place_name}
+              </Text>
+            </View>
+            <View
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignSelf: 'flex-end',
+              }}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('ReadReview', {uid: uid})}
+                style={{
+                  backgroundColor: 'red',
+                  paddingVertical: Platform.OS === 'ios' ? 12 : 10,
+                  paddingHorizontal: 10,
+                  borderRadius: 10,
+                  // height: 40,
+                  justifyContent: 'center',
+                }}>
+                <Text style={{color: 'white'}}>조회</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('Review', {
+                    uid: uid,
+                    latitude: item.latitude,
+                    longitude: item.longitude,
+                    place_name: item.place_name,
+                    address_name: item.address_name,
+                    category_group_name: item.category_group_name,
+                  })
+                }
+                style={{
+                  backgroundColor: '#1581ec',
+                  paddingVertical: Platform.OS === 'ios' ? 12 : 10,
+                  paddingHorizontal: 10,
+                  borderRadius: 10,
+                  // height: 40,
+                  justifyContent: 'center',
+                  marginLeft: 5,
+                }}>
+                <Text style={{color: 'white'}}>추가</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: 10,
+            }}>
+            <View>
+              <Text>주소: {item.address_name}</Text>
+            </View>
+            {item.category_group_name ? (
+              <View
+                style={{
+                  borderRadius: 15,
+                  borderWidth: 1,
+                  borderColor: '#c5c6c7',
+                  paddingHorizontal: 8,
+                  paddingVertical: 3,
+                  marginLeft: 8,
+                }}>
+                <Text style={{color: '#8b8c8c'}}>
+                  {item.category_group_name}
+                </Text>
+              </View>
+            ) : (
+              <></>
+            )}
+          </View>
+        </View>
+      </TouchableOpacity>
+    ),
+    [],
+  );
 
   const ItemSeparatorView = () => {
     return (
@@ -206,137 +311,71 @@ const MainScreen = ({route}) => {
   // Views
   return (
     <SafeAreaView style={styles.container}>
-      <BottomSheetModalProvider>
-        {/* NaverMapView를 TextInput과 같은 레벨의 View로 이동 */}
-        <View style={styles.mapViewContainer}>
-          {focus ? (
-            <FlatList
-              data={filterData}
-              keyExtractor={(item, index) => index.toString()}
-              ItemSeparatorComponent={ItemSeparatorView}
-              renderItem={ItemView}
-            />
-          ) : (
-            <NaverMapView
-              style={styles.mapView}
-              ref={mapRef}
-              showsMyLocationButton={true}
-              center={{...location, zoom: 16}}
-            />
-          )}
+      {/* <BottomSheetModalProvider> */}
+      {/* NaverMapView를 TextInput과 같은 레벨의 View로 이동 */}
+      <View style={styles.mapViewContainer}>
+        {focus && address ? (
+          <FlatList
+            data={filterData}
+            keyExtractor={(item, index) => index.toString()}
+            ItemSeparatorComponent={ItemSeparatorView}
+            renderItem={SearchItemView}
+          />
+        ) : (
+          <NaverMapView
+            style={styles.mapView}
+            ref={mapRef}
+            showsMyLocationButton={true}
+            center={{...location, zoom: 16}}>
+            {locationList.map((item, index) => (
+              <Marker
+                key={index}
+                pinColor="blue"
+                coordinate={{
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                }}
+                title={item.place_name}
+                onClick={() => console.log('onclick!!', item)}
+              />
+            ))}
+          </NaverMapView>
+        )}
+      </View>
+
+      {/* TextInput을 절대 위치로 지정하여 Map 위에 위치하도록 함 */}
+      <View style={styles.search_wrapper}>
+        <View style={styles.textInputContainer}>
+          <TextInput
+            value={address}
+            // onChangeText={text => setAddress(text)}
+            onChangeText={text => searchFilter(text)}
+            placeholder="주소를 입력해주세요."
+            style={styles.textinput}
+            onSubmitEditing={searchAddress}
+            returnKeyType="done"
+            onFocus={e => setFocus(!!e)}
+            underlineColorAndroid="transparent"
+          />
         </View>
+        <TouchableOpacity style={styles.searchButton} onPress={searchAddress}>
+          <Text style={styles.buttonText}>검색</Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* TextInput을 절대 위치로 지정하여 Map 위에 위치하도록 함 */}
-        <View style={styles.search_wrapper}>
-          <View style={styles.textInputContainer}>
-            <TextInput
-              value={address}
-              // onChangeText={text => setAddress(text)}
-              onChangeText={text => searchFilter(text)}
-              placeholder="주소를 입력해주세요."
-              style={styles.textinput}
-              onSubmitEditing={searchAddress}
-              returnKeyType="done"
-              onFocus={e => setFocus(!!e)}
-              underlineColorAndroid="transparent"
-            />
-          </View>
-          <TouchableOpacity style={styles.searchButton} onPress={searchAddress}>
-            <Text style={styles.buttonText}>검색</Text>
-          </TouchableOpacity>
-        </View>
-
-        <BottomSheetModal
-          ref={bottomSheetModalRef}
-          index={1}
-          snapPoints={snapPoints}
-          onChange={handleSheetChanges}
-          backdropComponent={handleSheetBackdrop}>
-          <BottomSheetView>
-            {bottomSheetList && (
-              <View style={{padding: 10}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-                      {bottomSheetList.place_name}
-                    </Text>
-                    <View style={{marginTop: 10}}>
-                      <Text>{bottomSheetList.address_name}</Text>
-                    </View>
-                    {bottomSheetList.category_group_name ? (
-                      <View
-                        style={{
-                          borderRadius: 15,
-                          borderWidth: 1,
-                          borderColor: '#c5c6c7',
-                          paddingHorizontal: 15,
-                          paddingVertical: 5,
-                          marginTop: 10,
-                        }}>
-                        <Text style={{color: '#8b8c8c'}}>
-                          {bottomSheetList.category_group_name}
-                        </Text>
-                      </View>
-                    ) : (
-                      <></>
-                    )}
-                    <View
-                      style={{
-                        justifyContent: 'center',
-                        alignSelf: 'flex-start',
-                      }}>
-                      <Text>평점</Text>
-                    </View>
-
-                    <View
-                      style={{
-                        height: 0.5,
-                        width: '100%',
-                        backgroundColor: '#c8c8c8',
-                        marginTop: 50,
-                        marginBottom: 50,
-                      }}
-                    />
-
-                    <View
-                      style={{
-                        justifyContent: 'center',
-                        alignSelf: 'flex-start',
-                      }}>
-                      <Text>리뷰</Text>
-                    </View>
-
-                    <TouchableOpacity
-                      style={styles.bottomSheetAddButton}
-                      onPress={() =>
-                        navigation.navigate('Review', {
-                          uid: uid,
-                          location: location,
-                          place_name: bottomSheetList.place_name,
-                          address_name: bottomSheetList.address_name,
-                          category_group_name: bottomSheetList.category_group_name,
-                        })
-                      }>
-                      <Text style={{color: 'white'}}>추가</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View>{/* body에 들어갈 부분 */}</View>
-              </View>
-            )}
-          </BottomSheetView>
-        </BottomSheetModal>
-      </BottomSheetModalProvider>
+      <BottomSheet
+        ref={bottomSheetRef}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        index={-1}
+        backdropComponent={handleSheetBackdrop}
+        enablePanDownToClose={true}>
+        <BottomSheetFlatList
+          data={locationList}
+          renderItem={BottomSheetItemView}
+          ItemSeparatorComponent={ItemSeparatorView}
+        />
+      </BottomSheet>
     </SafeAreaView>
   );
 };
@@ -349,8 +388,6 @@ const styles = StyleSheet.create({
   mapViewContainer: {
     flex: 1,
     marginTop: Platform.OS === 'android' ? 60 : 40,
-    // justifyContent: 'center',
-    // alignItems: 'center',
   },
   mapView: {
     position: 'absolute',
@@ -358,10 +395,10 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   search_wrapper: {
-    position: 'absolute', // 절대 위치 사용
-    top: Platform.OS === 'android' ? 10 : 55, // android 같은 경우 10, iOS 같은 경우 70
-    left: 10, // 왼쪽에서 10의 여백을 줌
-    right: 10, // 오른쪽에서 10의 여백을 줌
+    position: 'absolute',
+    top: Platform.OS === 'android' ? 10 : 55,
+    left: 10,
+    right: 10,
     height: 50,
     padding: 10,
     flexDirection: 'row',
@@ -383,7 +420,7 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     backgroundColor: '#1581ec',
-    paddingVertical: 10,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 10,
     paddingHorizontal: 20,
     borderRadius: 10,
     height: 40,
@@ -405,7 +442,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-end',
     margin: 10,
-  }
+  },
 });
 
 export default MainScreen;

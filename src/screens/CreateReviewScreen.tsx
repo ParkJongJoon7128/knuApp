@@ -4,7 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useRef, useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const ReviewScreen = ({route}) => {
+const CreateReviewScreen = ({route}) => {
   //Logics
   const navigation =
     useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
@@ -158,4 +158,4 @@ const ReviewScreen = ({route}) => {
   );
 };
 
-export default ReviewScreen;
+export default CreateReviewScreen;

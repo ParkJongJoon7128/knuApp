@@ -11,11 +11,12 @@ import React, { useEffect } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { RecoilRoot } from 'recoil';
+import CreateReviewScreen from './src/screens/CreateReviewScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import MainScreen from './src/screens/MainScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import ReadReviewScreen from './src/screens/ReadReviewScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
-import ReviewScreen from './src/screens/ReviewScreen';
-
 
 const Stack = createStackNavigator();
 
@@ -49,6 +50,13 @@ function App(): React.JSX.Element {
             component={RegisterScreen}
             options={{headerShown: false}}
           />
+
+          <Stack.Screen
+            name="Profile"
+            component={ProfileScreen}
+            options={{headerShown: false}}
+          />
+
           <Stack.Screen
             name="Main"
             component={MainScreen}
@@ -56,9 +64,15 @@ function App(): React.JSX.Element {
           />
 
           <Stack.Screen
-            name="Review"
-            component={ReviewScreen}
+            name="CreateReview"
+            component={CreateReviewScreen}
             options={{headerShown: false}}
+          />
+
+          <Stack.Screen
+            name="ReadReview"
+            component={ReadReviewScreen}
+            options={{title: '리얼리뷰'}}
           />
         </Stack.Navigator>
       </NavigationContainer>

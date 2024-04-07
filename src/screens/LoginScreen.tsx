@@ -1,5 +1,6 @@
 import { firebase } from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useRef, useState } from 'react';
 import {
   Alert,
@@ -13,7 +14,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const LoginScreen = () => {
   // Logic
-  const navigation = useNavigation<ROOT_NAVIGATION>();
+  const navigation = useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

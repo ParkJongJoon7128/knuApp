@@ -14,4 +14,19 @@ export interface UserType {
   place_name?: string;
   latitude?: number;
   longitude?: number;
+  rating?: number;
+  advantage?: string;
+  disadvantage?: string;
+}
+
+export interface ReviewType {
+  address_name?: string;
+  category_group_name?: string;
+  phone_number?: string;
+  place_name?: string;
+  latitude?: number;
+  longitude?: number;
+  rating?: number;
+  advantage?: string;
+  disadvantage?: string;
 }

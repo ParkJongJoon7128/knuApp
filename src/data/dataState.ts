@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { LocationType, UserType } from '../lib/type';
+import { LocationType, ReviewType, UserType } from '../lib/type';
 
 export const userState = atom<UserType[]>({
   key: 'userState',
@@ -13,5 +13,10 @@ export const locationState = atom<LocationType[]>({
 
 export const BottomSheetDataState = atom({
   key: 'BottomSheetDataState',
+  default: [],
+});
+
+export const ReviewState = atom<ReviewType[]>({
+  key: 'ReviewState',
   default: [],
 });

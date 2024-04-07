@@ -2,6 +2,7 @@ import { firebase } from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useRef, useState } from 'react';
 import {
@@ -16,7 +17,7 @@ import {
 
 const RegisterScreen = () => {
   // Logic
-  const navigation = useNavigation<ROOT_NAVIGATION>();
+  const navigation = useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
   const userCollection = firestore().collection('users');
 
   const [displayName, setDisplayName] = useState('');
