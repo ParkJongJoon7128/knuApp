@@ -35,12 +35,12 @@ const LoginScreen = () => {
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then(result => {
-          console.log(
-            'Login: ',
-            result.user.email,
-            result.user.displayName,
-            result.user.uid,
-          );
+          // console.log(
+          //   'Login: ',
+          //   result.user.email,
+          //   result.user.displayName,
+          //   result.user.uid,
+          // );
           setEmail('');
           setPassword('');
           navigation.navigate('Main', {uid: result.user.uid});

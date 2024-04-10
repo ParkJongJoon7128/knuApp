@@ -3,15 +3,23 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useRef, useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import StarRating from 'react-native-star-rating-widget';
 
 const CreateReviewScreen = ({route}) => {
   //Logics
   const navigation =
     useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
-  const {uid, location, place_name, address_name, category_group_name} =
-    route.params;
+  const {
+    uid,
+    location,
+    place_name,
+    address_name,
+    category_group_name,
+    // place_url,
+  } = route.params;
   const [advantage, setAdvantage] = useState('');
   const [disadvantage, setDisadvantage] = useState('');
+  const [rating, setRating] = useState(0);
 
   const inputRef = useRef(null);
 
@@ -24,17 +32,19 @@ const CreateReviewScreen = ({route}) => {
   const AddReview = async () => {
     try {
       await database()
-        .ref('locations/')
+        .ref('reviews/')
         .child(uid)
         .push({
           place_name,
           location,
           address_name,
+          rating,
           category_group_name,
           advantage,
           disadvantage,
+          // place_url
         })
-        .once('value')
+        .once('child_added')
         .then(res => {
           console.log('데이터 추가: ', res);
         })
@@ -81,6 +91,17 @@ const CreateReviewScreen = ({route}) => {
           marginTop: 30,
         }}>
         <Text style={{fontSize: 14}}>평점</Text>
+        <View style={{marginTop: 10}}>
+          <StarRating rating={rating} onChange={setRating} />
+        </View>
+        <View
+          style={{
+            height: 0.5,
+            width: '100%',
+            backgroundColor: '#c8c8c8',
+            marginTop: 15,
+          }}
+        />
       </View>
 
       <View

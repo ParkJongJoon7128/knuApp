@@ -3,6 +3,7 @@ export interface LocationType {
   category_group_name?: string;
   phone_number?: string;
   place_name?: string;
+  thumbnail_url?:string,
   latitude?: string;
   longitude?: string;
 }
