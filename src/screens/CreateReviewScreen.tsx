@@ -11,11 +11,12 @@ const CreateReviewScreen = ({route}) => {
     useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
   const {
     uid,
-    location,
+    latitude,
+    longitude,
     place_name,
     address_name,
     category_group_name,
-    // place_url,
+    // thumbnail_url,
   } = route.params;
   const [advantage, setAdvantage] = useState('');
   const [disadvantage, setDisadvantage] = useState('');
@@ -32,26 +33,28 @@ const CreateReviewScreen = ({route}) => {
   const AddReview = async () => {
     try {
       await database()
-        .ref('reviews/')
+        .ref('reviews')
         .child(uid)
         .push({
-          place_name,
-          location,
-          address_name,
+          placeName: place_name,
+          addressName: address_name,
+          categoryName: category_group_name,
           rating,
-          category_group_name,
-          advantage,
-          disadvantage,
-          // place_url
+          location: {latitude, longitude},
+          content: {advantage, disadvantage},
+          // latitude,
+          // longitude,
+          // imageUrl: thumbnail_url,
+          email,
         })
-        .once('child_added')
+        .once('value')
         .then(res => {
           console.log('데이터 추가: ', res);
-        })
-        .catch(err => {
-          console.log('데이터 추가 실패: ', err);
+          navigation.goBack();
         });
-    } catch (error) {}
+    } catch (error) {
+      console.log('데이터 추가 실패: ', error);
+    }
   };
 
   //Views

@@ -1,5 +1,4 @@
 import {
-  KAKAO_IMAGE_API_URL,
   KAKAO_REST_API_KEY,
   KAKAO_SEARCH_LOCATION_API_URL
 } from '@env';
@@ -98,6 +97,35 @@ const MainScreen = ({route}) => {
         params: {
           query: address,
         },
+      }).then(result => {
+        setFilterData(
+          result.data.documents.map(data => ({
+            place_name: data.place_name,
+            address_name: data.address_name,
+            category_group_name: data.category_group_name,
+            latitude: parseFloat(data.y),
+            longitude: parseFloat(data.x),
+          })),
+        );
+        setMasterData(
+          result.data.documents.map(data => ({
+            place_name: data.place_name,
+            address_name: data.address_name,
+            category_group_name: data.category_group_name,
+            latitude: parseFloat(data.y),
+            longitude: parseFloat(data.x),
+          })),
+        );
+        setLocationList(
+          result.data.documents.map(data => ({
+            address_name: data.address_name,
+            category_group_name: data.category_group_name,
+            phone_number: data.phone,
+            place_name: data.place_name,
+            latitude: parseFloat(data.y),
+            longitude: parseFloat(data.x),
+          })),
+        );
       });
     } catch (error) {
       console.log('주소 검색 에러: ', error);
@@ -105,70 +133,70 @@ const MainScreen = ({route}) => {
     }
   };
 
-  const searchImage = async () => {
-    try {
-      // 여기도 마찬가지로 결과를 반환합니다.
-      return await axios.get(KAKAO_IMAGE_API_URL, {
-        headers: {
-          Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
-        },
-        params: {
-          query: address,
-        },
-      });
-    } catch (error) {
-      console.log('이미지 get 에러: ', error);
-      throw error;
-    }
-  };
+  // const searchImage = async () => {
+  //   try {
+  //     // 여기도 마찬가지로 결과를 반환합니다.
+  //     return await axios.get(KAKAO_IMAGE_API_URL, {
+  //       headers: {
+  //         Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
+  //       },
+  //       params: {
+  //         query: address,
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.log('이미지 get 에러: ', error);
+  //     throw error;
+  //   }
+  // };
 
-  const test = async () => {
-    try {
-      return await Promise.all([searchAddress(), searchImage()]).then(
-        ([res1, res2]) => {
-          setFilterData(
-            res1.data.documents.map(data => ({
-              place_name: data.place_name,
-              address_name: data.address_name,
-              category_group_name: data.category_group_name,
-              latitude: parseFloat(data.y),
-              longitude: parseFloat(data.x),
-            })),
-          );
+  // const test = async () => {
+  //   try {
+  //     return await Promise.all([searchAddress(), searchImage()]).then(
+  //       ([res1, res2]) => {
+  //         setFilterData(
+  //           res1.data.documents.map(data => ({
+  //             place_name: data.place_name,
+  //             address_name: data.address_name,
+  //             category_group_name: data.category_group_name,
+  //             latitude: parseFloat(data.y),
+  //             longitude: parseFloat(data.x),
+  //           })),
+  //         );
 
-          setMasterData(
-            res1.data.documents.map(data => ({
-              place_name: data.place_name,
-              address_name: data.address_name,
-              category_group_name: data.category_group_name,
-              latitude: parseFloat(data.y),
-              longitude: parseFloat(data.x),
-            })),
-          );
+  //         setMasterData(
+  //           res1.data.documents.map(data => ({
+  //             place_name: data.place_name,
+  //             address_name: data.address_name,
+  //             category_group_name: data.category_group_name,
+  //             latitude: parseFloat(data.y),
+  //             longitude: parseFloat(data.x),
+  //           })),
+  //         );
 
-        const data1 = res1.data.documents.map(data => ({
-          place_name: data.place_name,
-          address_name: data.address_name,
-          category_group_name: data.category_group_name,
-          latitude: parseFloat(data.y),
-          longitude: parseFloat(data.x),
-        }));
+  //       const data1 = res1.data.documents.map(data => ({
+  //         place_name: data.place_name,
+  //         address_name: data.address_name,
+  //         category_group_name: data.category_group_name,
+  //         latitude: parseFloat(data.y),
+  //         longitude: parseFloat(data.x),
+  //       }));
           
-        const data2 = res2.data.documents.map(data => ({
-          thumbnail_url: data.thumbnail_url,
-        }));
+  //       const data2 = res2.data.documents.map(data => ({
+  //         thumbnail_url: data.thumbnail_url,
+  //       }));
 
-        const result = data1.map((item, index) => {
-          return {...item, ...data2[index]};
-        })
+  //       const result = data1.map((item, index) => {
+  //         return {...item, ...data2[index]};
+  //       })
 
-        setLocationList(prev => [...prev, ...result]);
-        },
-      );
-    } catch (error) {
-      console.log('test error: ', error);
-    }
-  };
+  //       setLocationList(prev => [...prev, ...result]);
+  //       },
+  //     );
+  //   } catch (error) {
+  //     console.log('test error: ', error);
+  //   }
+  // };
 
   useEffect(() => {
     Geolocation.getCurrentPosition(
@@ -282,7 +310,8 @@ const MainScreen = ({route}) => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Text style={{fontSize: 20, color: '#1581ec'}}>
+              <Text
+                style={{fontSize: 20, color: '#1581ec', fontWeight: 'bold'}}>
                 {truncateText(item.place_name)}
               </Text>
             </View>
@@ -293,7 +322,12 @@ const MainScreen = ({route}) => {
                 alignSelf: 'flex-end',
               }}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('ReadReview', {uid: uid})}
+                onPress={() =>
+                  navigation.navigate('ReadReview', {
+                    uid: uid,
+                    placeName: item.place_name,
+                  })
+                }
                 style={{
                   backgroundColor: 'red',
                   paddingVertical: Platform.OS === 'ios' ? 12 : 10,
@@ -307,12 +341,14 @@ const MainScreen = ({route}) => {
                 onPress={() =>
                   navigation.navigate('CreateReview', {
                     uid: uid,
+                    email: email,
                     latitude: item.latitude,
                     longitude: item.longitude,
                     place_name: item.place_name,
                     address_name: item.address_name,
                     category_group_name: item.category_group_name,
                     place_url: item.place_url,
+                    // thumbnail_url: item.thumbnail_url,
                   })
                 }
                 style={{
@@ -320,7 +356,6 @@ const MainScreen = ({route}) => {
                   paddingVertical: Platform.OS === 'ios' ? 12 : 10,
                   paddingHorizontal: 10,
                   borderRadius: 10,
-                  // height: 40,
                   justifyContent: 'center',
                   marginLeft: 5,
                 }}>
@@ -328,19 +363,19 @@ const MainScreen = ({route}) => {
               </TouchableOpacity>
             </View>
           </View>
-          <View>
-            {/* <Image
+          {/* <View>
+            <Image
               source={{uri: item.thumbnail_url}}
               width={100}
               height={100}
-            /> */}
-          </View>
+            />
+          </View> */}
           <View
             style={{
               display: 'flex',
               flexDirection: 'row',
               alignItems: 'center',
-              marginTop: 2,
+              marginTop: 8,
             }}>
             <Text>{item.address_name}</Text>
             {item.category_group_name ? (
@@ -439,13 +474,13 @@ const MainScreen = ({route}) => {
             onChangeText={text => searchFilter(text)}
             placeholder="주소를 입력해주세요."
             style={styles.textinput}
-            onSubmitEditing={test}
+            onSubmitEditing={searchAddress}
             returnKeyType="done"
             onFocus={e => setFocus(!!e)}
             underlineColorAndroid="transparent"
           />
         </View>
-        <TouchableOpacity style={styles.searchButton} onPress={test}>
+        <TouchableOpacity style={styles.searchButton} onPress={searchAddress}>
           <Text style={styles.buttonText}>검색</Text>
         </TouchableOpacity>
       </View>

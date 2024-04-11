@@ -9,27 +9,56 @@ import { ReviewState } from '../data/dataState';
 
 const ShowReviewScreen = ({route}) => {
   // Logics
-  const {uid} = route.params;
+  const {uid, placeName} = route.params;
   const navigation =
     useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
 
   const [rating, setRating] = useState(0);
   const [reviewList, setReviewList] = useRecoilState(ReviewState);
 
+  // useEffect(() => {
+  //   database()
+  //     .ref('reviews')
+  //     .orderByChild('placeName')
+  //     .equalTo(place_name)
+  //     .once('value')
+  //     .then(res => {
+  //       const reviews = [];
+  //       res.forEach(item => {
+  //         reviews.push({
+  //           key: item.key,
+  //           ...item.val(),
+  //         });
+  //       });
+  //       setReviewList(reviews);
+  //     })
+  //     .catch(err => {
+  //       console.log('데이터 조회 에러:', err);
+  //     });
+  // }, []);
+
   useEffect(() => {
     database()
-      .ref('locations/')
-      .child(uid)
+      .ref('reviews')
       .once('value')
-      .then(res => {
+      .then(snapshot => {
         const reviews = [];
-        res.forEach(item => {
-          reviews.push({
-            key: item.key,
-            ...item.val(),
+        snapshot.forEach(data => {
+          data.forEach(res => {
+            const review = res.val();
+            if (review.placeName == placeName) {
+              reviews.push({
+                key: res.key,
+                ...review,
+              });
+            }
           });
         });
         setReviewList(reviews);
+        setRating(
+          reviews.map(data => data.rating).reduce((a, c) => a + c) /
+            reviews.length,
+        );
       })
       .catch(err => {
         console.log('데이터 조회 에러:', err);
@@ -37,7 +66,6 @@ const ShowReviewScreen = ({route}) => {
   }, []);
 
   useEffect(() => {
-    console.log('ShowReviewScreen', route.params);
     console.log('ReviewState: ', reviewList);
   }, []);
 
@@ -55,11 +83,11 @@ const ShowReviewScreen = ({route}) => {
             alignItems: 'center',
           }}>
           <Text style={{fontSize: 20, fontWeight: 'bold'}}>
-            {item.place_name}
+            {item.placeName}
           </Text>
         </View>
         <View>
-          <Text style={{fontSize: 20, fontWeight: 'bold'}}>평점: {'별것'}</Text>
+          <Text style={{fontSize: 20, fontWeight: 'bold'}}>평점: {item.rating}</Text>
         </View>
       </View>
     );
