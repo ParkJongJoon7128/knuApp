@@ -72,7 +72,7 @@ function App(): React.JSX.Element {
           <Stack.Screen
             name="ReadReview"
             component={ReadReviewScreen}
-            options={{title: '리얼리뷰'}}
+            options={{title: '리뷰관리'}}
           />
         </Stack.Navigator>
       </NavigationContainer>

@@ -11,6 +11,7 @@ const CreateReviewScreen = ({route}) => {
     useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
   const {
     uid,
+    nickname,
     latitude,
     longitude,
     place_name,
@@ -18,7 +19,7 @@ const CreateReviewScreen = ({route}) => {
     category_group_name,
     // thumbnail_url,
   } = route.params;
-  const [advantage, setAdvantage] = useState('');
+  const [content, setContent] = useState('');
   const [disadvantage, setDisadvantage] = useState('');
   const [rating, setRating] = useState(0);
 
@@ -36,16 +37,14 @@ const CreateReviewScreen = ({route}) => {
         .ref('reviews')
         .child(uid)
         .push({
+          uid,
+          nickname,
           placeName: place_name,
           addressName: address_name,
           categoryName: category_group_name,
           rating,
           location: {latitude, longitude},
-          content: {advantage, disadvantage},
-          // latitude,
-          // longitude,
-          // imageUrl: thumbnail_url,
-          email,
+          content,
         })
         .once('value')
         .then(res => {
@@ -111,24 +110,25 @@ const CreateReviewScreen = ({route}) => {
         style={{
           justifyContent: 'center',
           alignContent: 'center',
-          marginTop: 30,
+          marginTop: 10,
         }}>
-        <Text style={{fontSize: 14}}>장점</Text>
+        <Text style={{fontSize: 14}}>리뷰 작성</Text>
 
         <View
           style={{
             width: '100%',
-            height: 40,
+            height: 100,
             borderWidth: 1,
             borderRadius: 10,
             marginTop: 15,
             padding: 10,
           }}>
           <TextInput
-            onChangeText={e => setAdvantage(e)}
-            value={advantage}
+            onChangeText={setContent}
+            value={content}
             placeholder="장점"
-            style={{margin: 0, padding: 0}}
+            style={{margin: 0, padding: 0, flexShrink: 1}}
+            multiline={true}
             onSubmitEditing={handleAdvantageSubmit}
             returnKeyType="next"
           />
@@ -141,27 +141,6 @@ const CreateReviewScreen = ({route}) => {
           alignContent: 'center',
           marginTop: 20,
         }}>
-        <Text style={{fontSize: 14}}>단점</Text>
-
-        <View
-          style={{
-            width: '100%',
-            height: 40,
-            borderWidth: 1,
-            borderRadius: 10,
-            marginTop: 15,
-            padding: 10,
-          }}>
-          <TextInput
-            onChangeText={e => setDisadvantage(e)}
-            value={disadvantage}
-            placeholder="단점"
-            style={{margin: 0, padding: 0}}
-            onSubmitEditing={AddReview}
-            returnKeyType="done"
-          />
-        </View>
-
         <TouchableOpacity
           style={{
             backgroundColor: '#1581ec',

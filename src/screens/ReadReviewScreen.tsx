@@ -1,9 +1,11 @@
+import CheckBox from '@react-native-community/checkbox';
 import database from '@react-native-firebase/database';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import StarRating from 'react-native-star-rating-widget';
+import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StarRatingDisplay } from 'react-native-star-rating-widget';
+import { err } from 'react-native-svg';
 import { useRecoilState } from 'recoil';
 import { ReviewState } from '../data/dataState';
 
@@ -14,28 +16,9 @@ const ShowReviewScreen = ({route}) => {
     useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
 
   const [rating, setRating] = useState(0);
-  const [reviewList, setReviewList] = useRecoilState(ReviewState);
+  const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
-  // useEffect(() => {
-  //   database()
-  //     .ref('reviews')
-  //     .orderByChild('placeName')
-  //     .equalTo(place_name)
-  //     .once('value')
-  //     .then(res => {
-  //       const reviews = [];
-  //       res.forEach(item => {
-  //         reviews.push({
-  //           key: item.key,
-  //           ...item.val(),
-  //         });
-  //       });
-  //       setReviewList(reviews);
-  //     })
-  //     .catch(err => {
-  //       console.log('데이터 조회 에러:', err);
-  //     });
-  // }, []);
+  const [reviewList, setReviewList] = useRecoilState(ReviewState);
 
   useEffect(() => {
     database()
@@ -56,38 +39,88 @@ const ShowReviewScreen = ({route}) => {
         });
         setReviewList(reviews);
         setRating(
-          reviews.map(data => data.rating).reduce((a, c) => a + c) /
-            reviews.length,
+          (
+            reviews.map(data => data.rating).reduce((a, c) => a + c) /
+            reviews.length
+          ).toFixed(1),
         );
+      })
+      .then(() => {
+        console.log('ReviewState: ', reviewList);
       })
       .catch(err => {
         console.log('데이터 조회 에러:', err);
       });
   }, []);
 
-  useEffect(() => {
-    console.log('ReviewState: ', reviewList);
-  }, []);
+  const removeReview = () => {
+    try {
+      database()
+      .ref('reviews')
+      .child(uid)
+      .remove()
+    } catch (error) {
+      console.log('데이터 삭제: ', err);
+    }
+  }
 
   const ReviewItemView = useCallback(({item, index}: any) => {
     return (
       <View
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+        key={index}
+        style={{paddingVertical: 10, display: 'flex', flexDirection: 'column'}}>
+        <View>
+          <Text style={{fontSize: 16, fontWeight: 'bold'}}>
             {item.placeName}
           </Text>
         </View>
+        <View
+          style={{
+            marginVertical: 10,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+          <View>
+            <StarRatingDisplay
+              rating={item.rating}
+              starSize={18}
+              emptyColor="white"
+            />
+          </View>
+          {reviewList.map(data =>
+            data.uid === uid ? (
+              <View
+                style={{
+                  borderRadius: 10,
+                  backgroundColor: '#efefef',
+                  paddingVertical: 5,
+                  paddingHorizontal: 10,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <TouchableOpacity onPress={removeReview}>
+                  <Text>삭제</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <></>
+            ),
+          )}
+          {/* <View
+            style={{
+              borderRadius: 10,
+              backgroundColor: '#efefef',
+              paddingVertical: 5,
+              paddingHorizontal: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text>삭제</Text>
+          </View> */}
+        </View>
         <View>
-          <Text style={{fontSize: 20, fontWeight: 'bold'}}>평점: {item.rating}</Text>
+          <Text>{item.content}</Text>
         </View>
       </View>
     );
@@ -109,15 +142,37 @@ const ShowReviewScreen = ({route}) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <View>
-          <Text style={{fontSize: 25, fontWeight: 'bold'}}>평점</Text>
-        </View>
-        <View style={{margin: 10}}>
-          <StarRating rating={rating} onChange={setRating} />
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 30,
+          }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <View>
+              <StarRatingDisplay rating={rating} />
+            </View>
+            <View>
+              <Text style={{fontSize: 32, fontWeight: 'bold'}}>{rating}</Text>
+            </View>
+          </View>
+          <View style={{marginTop: 15}}>
+            <Text style={{color: '#b5b5b5', fontWeight: 'bold'}}>
+              {reviewList.length}명 평가
+            </Text>
+          </View>
         </View>
         <View
           style={{
-            height: 5,
+            height: 7,
             width: '100%',
             backgroundColor: '#f9f9f9',
           }}
@@ -126,11 +181,51 @@ const ShowReviewScreen = ({route}) => {
       <View
         style={{
           flex: 4,
-          margin: 15,
+          marginHorizontal: 15,
         }}>
-        <View style={{justifyContent: 'center', alignSelf: 'flex-start'}}>
-          <Text style={{fontSize: 15}}>리뷰 {reviewList.length}개</Text>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignSelf: 'flex-start',
+            marginVertical: 15,
+          }}>
+          <View>
+            <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+              리뷰 {reviewList.length}
+            </Text>
+          </View>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: 10,
+            }}>
+            <CheckBox
+              disabled={false}
+              value={toggleCheckBox}
+              onValueChange={newValue => setToggleCheckBox(newValue)}
+              boxType="square"
+              onAnimationType="fade"
+              offAnimationType="fade"
+              style={{width: 16, height: 16}}
+            />
+            <View
+              style={{
+                marginHorizontal: 10,
+              }}>
+              <Text>사진 리뷰만 보기 </Text>
+            </View>
+          </View>
         </View>
+        <View
+          style={{
+            height: 1,
+            width: '100%',
+            backgroundColor: '#d2d2d2',
+          }}
+        />
         <FlatList
           data={reviewList}
           keyExtractor={(item, index) => index.toString()}

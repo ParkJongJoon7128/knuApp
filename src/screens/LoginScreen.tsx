@@ -45,6 +45,7 @@ const LoginScreen = () => {
           setPassword('');
           navigation.navigate('Main', {
             uid: result.user.uid,
+            nickname: result.user.displayName
           });
         })
         .catch(err => {

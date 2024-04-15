@@ -21,6 +21,7 @@ export interface UserType {
 }
 
 export interface ReviewType {
+  uid?: string;
   address_name?: string;
   category_group_name?: string;
   phone_number?: string;

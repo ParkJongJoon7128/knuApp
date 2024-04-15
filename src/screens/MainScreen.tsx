@@ -37,7 +37,7 @@ const MainScreen = ({route}) => {
   // Logic
   const navigation =
     useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
-  const {uid} = route.params;
+  const {uid, nickname} = route.params;
 
   const [user, setUser] = useState<any>();
   const [initializing, setInitializing] = useState(true);
@@ -88,7 +88,6 @@ const MainScreen = ({route}) => {
 
   const searchAddress = async () => {
     try {
-      // axios.get의 결과를 반환합니다.
       return await axios.get(KAKAO_SEARCH_LOCATION_API_URL, {
         headers: {
           Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
@@ -129,74 +128,9 @@ const MainScreen = ({route}) => {
       });
     } catch (error) {
       console.log('주소 검색 에러: ', error);
-      throw error; // 에러를 다시 던져서 상위 catch 문에서 잡을 수 있게 합니다.
+      throw error; 
     }
   };
-
-  // const searchImage = async () => {
-  //   try {
-  //     // 여기도 마찬가지로 결과를 반환합니다.
-  //     return await axios.get(KAKAO_IMAGE_API_URL, {
-  //       headers: {
-  //         Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
-  //       },
-  //       params: {
-  //         query: address,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.log('이미지 get 에러: ', error);
-  //     throw error;
-  //   }
-  // };
-
-  // const test = async () => {
-  //   try {
-  //     return await Promise.all([searchAddress(), searchImage()]).then(
-  //       ([res1, res2]) => {
-  //         setFilterData(
-  //           res1.data.documents.map(data => ({
-  //             place_name: data.place_name,
-  //             address_name: data.address_name,
-  //             category_group_name: data.category_group_name,
-  //             latitude: parseFloat(data.y),
-  //             longitude: parseFloat(data.x),
-  //           })),
-  //         );
-
-  //         setMasterData(
-  //           res1.data.documents.map(data => ({
-  //             place_name: data.place_name,
-  //             address_name: data.address_name,
-  //             category_group_name: data.category_group_name,
-  //             latitude: parseFloat(data.y),
-  //             longitude: parseFloat(data.x),
-  //           })),
-  //         );
-
-  //       const data1 = res1.data.documents.map(data => ({
-  //         place_name: data.place_name,
-  //         address_name: data.address_name,
-  //         category_group_name: data.category_group_name,
-  //         latitude: parseFloat(data.y),
-  //         longitude: parseFloat(data.x),
-  //       }));
-          
-  //       const data2 = res2.data.documents.map(data => ({
-  //         thumbnail_url: data.thumbnail_url,
-  //       }));
-
-  //       const result = data1.map((item, index) => {
-  //         return {...item, ...data2[index]};
-  //       })
-
-  //       setLocationList(prev => [...prev, ...result]);
-  //       },
-  //     );
-  //   } catch (error) {
-  //     console.log('test error: ', error);
-  //   }
-  // };
 
   useEffect(() => {
     Geolocation.getCurrentPosition(
@@ -221,7 +155,6 @@ const MainScreen = ({route}) => {
       .child(uid)
       .once('value')
       .then(res => {
-        // console.log('초기 데이터: ', res);
         setUserList(prev => [...prev, res]);
       })
       .catch(err => {
@@ -231,8 +164,7 @@ const MainScreen = ({route}) => {
 
   useEffect(() => {
     console.log('locationState: ', locationList);
-    // console.log('userState: ', userList);
-  }, [locationList]);
+  }, []);
 
   const SearchItemView = ({item}) => {
     return (
@@ -341,14 +273,13 @@ const MainScreen = ({route}) => {
                 onPress={() =>
                   navigation.navigate('CreateReview', {
                     uid: uid,
-                    email: email,
+                    nickname: nickname,
                     latitude: item.latitude,
                     longitude: item.longitude,
                     place_name: item.place_name,
                     address_name: item.address_name,
                     category_group_name: item.category_group_name,
                     place_url: item.place_url,
-                    // thumbnail_url: item.thumbnail_url,
                   })
                 }
                 style={{
