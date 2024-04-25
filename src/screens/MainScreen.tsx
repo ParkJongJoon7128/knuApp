@@ -151,19 +151,16 @@ const MainScreen = ({route}) => {
 
   useEffect(() => {
     database()
-      .ref('locations/')
+      .ref('reviews')
       .child(uid)
       .once('value')
       .then(res => {
+        console.log("MainScreen: ", res);
         setUserList(prev => [...prev, res]);
       })
       .catch(err => {
         console.log('데이터 조회 에러:', err);
       });
-  }, []);
-
-  useEffect(() => {
-    console.log('locationState: ', locationList);
   }, []);
 
   const SearchItemView = ({item}) => {

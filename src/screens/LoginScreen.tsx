@@ -4,21 +4,24 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useRef, useState } from 'react';
 import {
   Alert,
-  SafeAreaView,
+  Image,
   StyleSheet,
   Text,
   TextInput,
-  View,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const LoginScreen = () => {
   // Logic
-  const navigation = useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
-  
+  const navigation =
+    useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
+
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
+  const [pwd, setPwd] = useState('');
+  const [visible, setVisible] = useState(true);
+
   const inputRef = useRef(null);
 
   const handleEmailSubmit = () => {
@@ -26,14 +29,14 @@ const LoginScreen = () => {
       inputRef.current.focus();
     }
   };
-  
-  const Login = (email: string, password: string) => {
-    if (!email || !password) {
+
+  const Login = (email: string, pwd: string) => {
+    if (!email || !pwd) {
       Alert.alert('값을 입력해주세요');
     } else {
       return firebase
         .auth()
-        .signInWithEmailAndPassword(email, password)
+        .signInWithEmailAndPassword(email, pwd)
         .then(result => {
           console.log(
             'Login: ',
@@ -42,10 +45,10 @@ const LoginScreen = () => {
             result.user.uid,
           );
           setEmail('');
-          setPassword('');
+          setPwd('');
           navigation.navigate('Main', {
             uid: result.user.uid,
-            nickname: result.user.displayName
+            nickname: result.user.displayName,
           });
         })
         .catch(err => {
@@ -56,52 +59,131 @@ const LoginScreen = () => {
 
   // Views
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.wrapper}>
-        <View style={styles.logo_wrapper}>
-          <Text style={styles.logo}>Login</Text>
+    // 전체 레이아
+      <KeyboardAwareScrollView
+        contentContainerStyle={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'white',
+          paddingHorizontal: 30,
+        }}
+        resetScrollToCoords={{x: 0, y: 0}}
+        scrollEnabled={false}
+        extraHeight={300} // 키보드가 활성화 됐을 때 추가적으로 더 보여질 높이
+        enableOnAndroid={true} // 안드로이드에서도 동일하게 작동하도록 설정
+        keyboardShouldPersistTaps="handled">
+        {/* 텍스트 인풋 레이아웃 */}
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            marginBottom: 30,
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              height: 60,
+              borderRadius: 15,
+              padding: 15,
+              backgroundColor: '#e5e5e5',
+              marginBottom: 7.5,
+            }}>
+            <TextInput
+              placeholder="이메일"
+              onChangeText={text => setEmail(text)}
+              value={email}
+              onSubmitEditing={handleEmailSubmit}
+              returnKeyType="next"
+              style={{flex: 1, paddingVertical: 0}}
+            />
+
+            <TouchableOpacity onPress={() => setEmail('')}>
+              <Image
+                source={require('../images/closecircle.png')}
+                style={{width: 24, height: 24, marginLeft: 10}}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              height: 60,
+              borderRadius: 15,
+              padding: 15,
+              backgroundColor: '#e5e5e5',
+              marginTop: 7.5,
+            }}>
+            <TextInput
+              placeholder="비밀번호"
+              onChangeText={text => setPwd(text)}
+              value={pwd}
+              ref={inputRef}
+              secureTextEntry={visible}
+              onSubmitEditing={() => () => Login(email, pwd)}
+              returnKeyType="done"
+              style={{flex: 1, paddingVertical: 0}}
+            />
+
+            {visible ? (
+              <TouchableOpacity onPress={() => setVisible(!visible)}>
+                <Image
+                  source={require('../images/visible.png')}
+                  style={{width: 24, height: 24, marginLeft: 10}}
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={() => setVisible(!visible)}>
+                <Image
+                  source={require('../images/invisible.png')}
+                  style={{width: 24, height: 24, marginLeft: 10}}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
-        <View style={styles.textinput_wrapper}>
-          <TextInput
-            onChangeText={e => setEmail(e)}
-            value={email}
-            placeholder="Email"
-            style={styles.textinput}
-            onSubmitEditing={handleEmailSubmit}
-            returnKeyType="next"
-          />
-        </View>
-        <View style={styles.textinput_wrapper}>
-          <TextInput
-            onChangeText={e => setPassword(e)}
-            value={password}
-            placeholder="PassWord"
-            secureTextEntry={true}
-            style={styles.textinput}
-            onSubmitEditing={() => Login(email, password)}
-            ref={inputRef}
-            returnKeyType="done"
-          />
+        {/* 버튼 레이아웃 */}
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            marginTop: 30,
+          }}>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              height: 60,
+              backgroundColor: '#2978f4',
+              borderRadius: 15,
+              marginBottom: 10,
+            }}>
+            <TouchableOpacity onPress={() => Login(email, pwd)}>
+              <Text style={{color: 'white', fontSize: 20}}>로그인</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.login_button_wrapper}>
+        {/* 회원가입 버튼 레이아웃 */}
+        <View style={{display: 'flex', alignSelf: 'flex-end', marginTop: 10}}>
           <TouchableOpacity
-            style={styles.login_button}
-            onPress={() => Login(email, password)}>
-            <Text style={styles.login_button_text}>Login</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.register_button_wrapper}>
-          <TouchableOpacity
-            style={styles.register_button}
+            // style={styles.registerButton}
             onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.register_button_text}>Register</Text>
+            <Text>회원가입</Text>
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+      </KeyboardAwareScrollView>
   );
 };
 

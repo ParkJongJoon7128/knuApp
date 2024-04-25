@@ -1,31 +1,33 @@
 import { firebase } from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
-import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import moment from 'moment';
 import React, { useRef, useState } from 'react';
 import {
   Alert,
-  SafeAreaView,
+  Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const RegisterScreen = () => {
   // Logic
-  const navigation = useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
-  const userCollection = firestore().collection('users');
+  const navigation =
+    useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
+  // const userCollection = firestore().collection('users');
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [visible, setVisible] = useState(true);
 
   const emailRef = useRef(null);
-  const pwRef = useRef(null);
+  const passwordRef = useRef(null);
 
   const handleEmailSubmit = () => {
     if (emailRef.current) {
@@ -34,8 +36,8 @@ const RegisterScreen = () => {
   };
 
   const handlePasswordSubmit = () => {
-    if (pwRef.current) {
-      pwRef.current.focus();
+    if (passwordRef.current) {
+      passwordRef.current.focus();
     }
   };
 
@@ -49,10 +51,10 @@ const RegisterScreen = () => {
         .then(result => {
           const {uid} = result.user;
           firebase.auth().currentUser?.updateProfile({displayName});
-          database().ref("users/").child(uid).set({
+          database().ref('users/').child(uid).set({
             date_created: moment().utc().format(),
             NickName: name,
-            email
+            email,
           });
           // firestore().collection('users').doc(uid).set({
           //   date_created: moment().utc().format(),
@@ -74,56 +76,140 @@ const RegisterScreen = () => {
 
   // Views
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.wrapper}>
-        <View style={styles.logo_wrapper}>
-          <Text style={styles.logo}>Register</Text>
+      <KeyboardAwareScrollView
+        contentContainerStyle={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'white',
+          paddingHorizontal: 30,
+        }}
+        resetScrollToCoords={{x: 0, y: 0}}
+        scrollEnabled={false}
+        extraHeight={300} // 키보드가 활성화 됐을 때 추가적으로 더 보여질 높이
+        enableOnAndroid={true} // 안드로이드에서도 동일하게 작동하도록 설정
+        keyboardShouldPersistTaps="handled">
+        {/* 텍스트 인풋 레이아웃 */}
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            marginBottom: 30,
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              height: 60,
+              borderRadius: 15,
+              padding: 15,
+              backgroundColor: '#e5e5e5',
+              marginBottom: 7.5,
+            }}>
+            <TextInput
+              placeholder="닉네임"
+              onChangeText={text => setDisplayName(text)}
+              value={displayName}
+              onSubmitEditing={handleEmailSubmit}
+              returnKeyType="next"
+              style={{flex: 1, paddingVertical: 0}}
+            />
+            <TouchableOpacity onPress={() => setDisplayName('')}>
+              <Image
+                source={require('../images/closecircle.png')}
+                style={{width: 24, height: 24, marginLeft: 10}}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              height: 60,
+              borderRadius: 15,
+              padding: 15,
+              backgroundColor: '#e5e5e5',
+              marginTop: 7.5,
+              marginBottom: 7.5,
+            }}>
+            <TextInput
+              placeholder="이메일"
+              onChangeText={text => setEmail(text)}
+              value={email}
+              ref={emailRef}
+              onSubmitEditing={handlePasswordSubmit}
+              returnKeyType="next"
+              style={{flex: 1, paddingVertical: 0}}
+            />
+            <TouchableOpacity onPress={() => setEmail('')}>
+              <Image
+                source={require('../images/closecircle.png')}
+                style={{width: 24, height: 24, marginLeft: 10}}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              height: 60,
+              borderRadius: 15,
+              padding: 15,
+              backgroundColor: '#e5e5e5',
+              marginTop: 7.5,
+            }}>
+            <TextInput
+              placeholder="비밀번호"
+              onChangeText={text => setPassword(text)}
+              value={password}
+              ref={passwordRef}
+              secureTextEntry={visible}
+              onSubmitEditing={() => Register(displayName, email, password)}
+              style={{flex: 1, paddingVertical: 0}}
+            />
+            {visible ? (
+              <TouchableOpacity onPress={() => setVisible(!visible)}>
+                <Image
+                  source={require('../images/visible.png')}
+                  style={{width: 24, height: 24, marginLeft: 10}}
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={() => setVisible(!visible)}>
+                <Image
+                  source={require('../images/invisible.png')}
+                  style={{width: 24, height: 24, marginLeft: 10}}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
-        <View style={styles.textinput_wrapper}>
-          <TextInput
-            onChangeText={e => setDisplayName(e)}
-            value={displayName}
-            placeholder="NickName"
-            style={styles.textinput}
-            onSubmitEditing={handleEmailSubmit}
-            returnKeyType="next"
-          />
-        </View>
-
-        <View style={styles.textinput_wrapper}>
-          <TextInput
-            onChangeText={e => setEmail(e)}
-            value={email}
-            placeholder="Email"
-            style={styles.textinput}
-            ref={emailRef}
-            onSubmitEditing={handlePasswordSubmit}
-            returnKeyType="next"
-          />
-        </View>
-
-        <View style={styles.textinput_wrapper}>
-          <TextInput
-            onChangeText={e => setPassword(e)}
-            value={password}
-            placeholder="PassWord"
-            secureTextEntry={true}
-            style={styles.textinput}
-            ref={pwRef}
-            onSubmitEditing={() => Register(displayName, email, password)}
-          />
-        </View>
-
-        <View style={styles.register_button_wrapper}>
-          <TouchableOpacity
-            onPress={() => Register(displayName, email, password)}
-            style={styles.register_button}>
-            <Text style={styles.register_button_text}>Register</Text>
+        {/* 버튼 레이아웃 */}
+        <View
+          style={{
+            width: '100%',
+            height: 60,
+            backgroundColor: '#2978f4',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 15,
+            marginTop: 30,
+          }}>
+          <TouchableOpacity onPress={() => Register(displayName, email, password)}>
+            <Text style={{color: 'white', fontSize: 20}}>회원가입</Text>
           </TouchableOpacity>
         </View>
-      </View>
-    </SafeAreaView>
+      </KeyboardAwareScrollView>
   );
 };
 

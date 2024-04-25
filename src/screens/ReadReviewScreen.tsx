@@ -53,12 +53,9 @@ const ShowReviewScreen = ({route}) => {
       });
   }, []);
 
-  const removeReview = () => {
+  const removeReview = (key: any) => {
     try {
-      database()
-      .ref('reviews')
-      .child(uid)
-      .remove()
+      database().ref('reviews').child(uid).child(key).remove();
     } catch (error) {
       console.log('데이터 삭제: ', err);
     }
@@ -99,7 +96,7 @@ const ShowReviewScreen = ({route}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <TouchableOpacity onPress={removeReview}>
+                <TouchableOpacity onPress={() => removeReview(item.key)}>
                   <Text>삭제</Text>
                 </TouchableOpacity>
               </View>
@@ -107,24 +104,13 @@ const ShowReviewScreen = ({route}) => {
               <></>
             ),
           )}
-          {/* <View
-            style={{
-              borderRadius: 10,
-              backgroundColor: '#efefef',
-              paddingVertical: 5,
-              paddingHorizontal: 10,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Text>삭제</Text>
-          </View> */}
         </View>
         <View>
           <Text>{item.content}</Text>
         </View>
       </View>
     );
-  }, []);
+  }, [uid]);
 
   const ItemSeparatorView = () => {
     return (
