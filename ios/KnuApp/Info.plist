@@ -4,6 +4,10 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>사용자 위치 정보를 수집합니다.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>[REASON]</string>
+	<key>NSCameraUsageDescription</key>
+	<string>[REASON]</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>

@@ -85,24 +85,20 @@ const ShowReviewScreen = ({route}) => {
               emptyColor="white"
             />
           </View>
-          {reviewList.map(data =>
-            data.uid === uid ? (
-              <View
-                style={{
-                  borderRadius: 10,
-                  backgroundColor: '#efefef',
-                  paddingVertical: 5,
-                  paddingHorizontal: 10,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <TouchableOpacity onPress={() => removeReview(item.key)}>
-                  <Text>삭제</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <></>
-            ),
+          {item.uid === uid && (
+            <View
+              style={{
+                borderRadius: 10,
+                backgroundColor: '#efefef',
+                paddingVertical: 5,
+                paddingHorizontal: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <TouchableOpacity onPress={() => removeReview(item.key)}>
+                <Text>삭제</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
         <View>

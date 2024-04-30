@@ -1,8 +1,18 @@
 import database from '@react-native-firebase/database';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import _ from 'lodash';
 import React, { useRef, useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import StarRating from 'react-native-star-rating-widget';
 
 const CreateReviewScreen = ({route}) => {
@@ -22,6 +32,7 @@ const CreateReviewScreen = ({route}) => {
   const [content, setContent] = useState('');
   const [disadvantage, setDisadvantage] = useState('');
   const [rating, setRating] = useState(0);
+  const [images, setImages] = useState([]);
 
   const inputRef = useRef(null);
 
@@ -56,108 +67,174 @@ const CreateReviewScreen = ({route}) => {
     }
   };
 
-  //Views
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignContent: 'center',
-        padding: 30,
-        backgroundColor: 'white',
-      }}>
-      <View
-        style={{
-          justifyContent: 'center',
-          alignContent: 'center',
-          alignSelf: 'flex-start',
-        }}>
-        <Text style={{fontSize: 40}}>리뷰를 남겨주세요!!</Text>
-      </View>
+  const getImages = () => {
+    if (images.length < 3) {
+      return _.map(_.range(0, 1), () => {
+        return {
+          path: '',
+          sourceURL: ''
+        };
+      });
+    } else if (images.length === 3) {
+      return _.map(_.range(0), () => {
+        return {
+          path: '',
+          sourceURL: '',
+        };
+      });
+    }
+    return images;
+  };
 
-      <View
-        style={{
-          justifyContent: 'center',
-          alignContent: 'center',
-          alignSelf: 'flex-start',
-          marginTop: 30,
-        }}>
-        <Text style={{fontSize: 14}}>장소: {place_name}</Text>
-      </View>
-
-      <View
-        style={{
-          justifyContent: 'center',
-          alignContent: 'center',
-          alignSelf: 'flex-start',
-          marginTop: 30,
-        }}>
-        <Text style={{fontSize: 14}}>평점</Text>
-        <View style={{marginTop: 10}}>
-          <StarRating rating={rating} onChange={setRating} />
-        </View>
-        <View
-          style={{
-            height: 0.5,
-            width: '100%',
-            backgroundColor: '#c8c8c8',
-            marginTop: 15,
-          }}
+  const renderItem = ({item, index}) => {
+    
+    // 이미지 첨부했을 때
+    const ActiveImage = (
+      <View key={index} style={{marginRight: 10}}>
+        <Image
+          source={{uri: item.path}}
+          style={{width: 74, height: 74, borderRadius: 5.7}}
         />
       </View>
-
+    );
+    // 이미지 첨부하지 않았을 때
+    const EmptyImage = (
       <View
         style={{
           justifyContent: 'center',
-          alignContent: 'center',
-          marginTop: 10,
-        }}>
-        <Text style={{fontSize: 14}}>리뷰 작성</Text>
-
-        <View
-          style={{
-            width: '100%',
-            height: 100,
-            borderWidth: 1,
-            borderRadius: 10,
-            marginTop: 15,
-            padding: 10,
-          }}>
-          <TextInput
-            onChangeText={setContent}
-            value={content}
-            placeholder="장점"
-            style={{margin: 0, padding: 0, flexShrink: 1}}
-            multiline={true}
-            onSubmitEditing={handleAdvantageSubmit}
-            returnKeyType="next"
-          />
-        </View>
-      </View>
-
-      <View
-        style={{
-          justifyContent: 'center',
-          alignContent: 'center',
-          marginTop: 20,
+          alignItems: 'center',
+          marginRight: 10,
         }}>
         <TouchableOpacity
           style={{
-            backgroundColor: '#1581ec',
-            paddingVertical: 10,
-            paddingHorizontal: 20,
-            borderRadius: 10,
-            height: 40,
+            borderWidth: 1,
+            borderColor: '#b6b6b6',
+            borderRadius: 8,
+            padding: 25,
+            marginTop: 10,
             justifyContent: 'center',
             alignItems: 'center',
-            alignSelf: 'flex-end',
-            marginTop: 30,
           }}
-          onPress={AddReview}>
-          <Text style={{color: 'white'}}>추가</Text>
+          onPress={() => {
+            ImageCropPicker.openPicker({
+              mediaType: 'photo',
+              // includeBase64: true,
+              multiple: true
+            })
+              .then(image => {
+                console.log("image: ", image);
+                setImages([...images, ...image]);
+              })
+              .catch(e => {
+                console.log(e);
+              });
+          }}>
+          <Image
+            source={require('../images/camera.png')}
+            style={{width: 20, height: 20}}
+            resizeMode="contain"
+            tintColor="#b6b6b6"
+          />
         </TouchableOpacity>
       </View>
-    </View>
+    );
+
+    return item.path ? ActiveImage : EmptyImage;
+  };
+
+  //Views
+  return (
+    // 전체 레이아웃
+    <KeyboardAwareScrollView
+      contentContainerStyle={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        paddingHorizontal: 30,
+      }}
+      resetScrollToCoords={{x: 0, y: 0}}
+      scrollEnabled={false}
+      extraHeight={300} // 키보드가 활성화 됐을 때 추가적으로 더 보여질 높이
+      enableOnAndroid={true} // 안드로이드에서도 동일하게 작동하도록 설정
+      keyboardShouldPersistTaps="handled">
+      {/* 매장 이름 레이아웃 */}
+      <View
+        style={{
+          justifyContent: 'center',
+          alignContent: 'center',
+          marginBottom: 5,
+        }}>
+        <Text style={{fontSize: 16, fontWeight: 'bold'}}>{place_name}</Text>
+      </View>
+
+      {/* 평점 레이아웃*/}
+      <View style={{marginTop: 5, marginBottom: 5}}>
+        <StarRating rating={rating} onChange={setRating} starSize={24} />
+      </View>
+
+      {/* 텍스트 인풋 레이아웃 */}
+      <View
+        style={{
+          width: '100%',
+          height: 150,
+          borderRadius: 15,
+          padding: 15,
+          backgroundColor: '#f6f6f6',
+          marginTop: 5,
+          marginBottom: 10,
+        }}>
+        <TextInput
+          onChangeText={setContent}
+          value={content}
+          placeholder="매장의 분위기와 음식의 맛, 양, 서비스 등 매장의 전반적인 부분에 대한 솔직한 리뷰를 작성해주세요."
+          multiline={true}
+          onSubmitEditing={handleAdvantageSubmit}
+          returnKeyType="next"
+          style={{margin: 0, padding: 0, flexShrink: 1}}
+        />
+      </View>
+
+      {/* 이미지 추가 레이아웃 */}
+      <View
+        style={{
+          justifyContent: 'center',
+          alignSelf: 'flex-start',
+        }}>
+        <FlatList
+          style={{flexGrow: 0}}
+          data={images.concat(getImages())}
+          // data={images}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          horizontal={true}
+          scrollEnabled={true}
+        />
+      </View>
+
+      {/* 버튼 레이아웃 */}
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          marginTop: 30,
+        }}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: 60,
+            backgroundColor: '#2978f4',
+            borderRadius: 15,
+          }}>
+          <TouchableOpacity>
+            <Text style={{color: 'white', fontSize: 20}}>완료</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 

@@ -128,7 +128,7 @@ const LoginScreen = () => {
               value={pwd}
               ref={inputRef}
               secureTextEntry={visible}
-              onSubmitEditing={() => () => Login(email, pwd)}
+              onSubmitEditing={() => Login(email, pwd)}
               returnKeyType="done"
               style={{flex: 1, paddingVertical: 0}}
             />

@@ -189,7 +189,7 @@ const MainScreen = ({route}) => {
               }}>
               <Text> {item.place_name}</Text>
             </View>
-            {item.category_group_name ? (
+            {item.category_group_name && (
               <View
                 style={{
                   borderRadius: 15,
@@ -204,8 +204,6 @@ const MainScreen = ({route}) => {
                   {item.category_group_name}
                 </Text>
               </View>
-            ) : (
-              <></>
             )}
           </View>
           <View style={{paddingHorizontal: 36, marginTop: 3, marginBottom: 8}}>
