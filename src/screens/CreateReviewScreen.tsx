@@ -9,7 +9,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -30,7 +30,6 @@ const CreateReviewScreen = ({route}) => {
     // thumbnail_url,
   } = route.params;
   const [content, setContent] = useState('');
-  const [disadvantage, setDisadvantage] = useState('');
   const [rating, setRating] = useState(0);
   const [images, setImages] = useState([]);
 
@@ -56,6 +55,7 @@ const CreateReviewScreen = ({route}) => {
           rating,
           location: {latitude, longitude},
           content,
+          images
         })
         .once('value')
         .then(res => {
@@ -72,14 +72,14 @@ const CreateReviewScreen = ({route}) => {
       return _.map(_.range(0, 1), () => {
         return {
           path: '',
-          sourceURL: ''
+          id: _.uniqueId(),
         };
       });
     } else if (images.length === 3) {
       return _.map(_.range(0), () => {
         return {
           path: '',
-          sourceURL: '',
+          id: _.uniqueId(),
         };
       });
     }
@@ -87,7 +87,6 @@ const CreateReviewScreen = ({route}) => {
   };
 
   const renderItem = ({item, index}) => {
-    
     // 이미지 첨부했을 때
     const ActiveImage = (
       <View key={index} style={{marginRight: 10}}>
@@ -95,6 +94,16 @@ const CreateReviewScreen = ({route}) => {
           source={{uri: item.path}}
           style={{width: 74, height: 74, borderRadius: 5.7}}
         />
+        <TouchableOpacity
+          style={{position: 'absolute', top: 6, right: 6}}
+          onPress={() => {
+            setImages(images.filter((_, idx) => idx !== index));
+          }}>
+          <Image
+            style={{width: 14, height: 14}}
+            source={require('../images/cancel.png')}
+          />
+        </TouchableOpacity>
       </View>
     );
     // 이미지 첨부하지 않았을 때
@@ -111,18 +120,16 @@ const CreateReviewScreen = ({route}) => {
             borderColor: '#b6b6b6',
             borderRadius: 8,
             padding: 25,
-            marginTop: 10,
             justifyContent: 'center',
             alignItems: 'center',
           }}
           onPress={() => {
             ImageCropPicker.openPicker({
               mediaType: 'photo',
-              // includeBase64: true,
-              multiple: true
+              multiple: true,
             })
               .then(image => {
-                console.log("image: ", image);
+                console.log('image: ', image);
                 setImages([...images, ...image]);
               })
               .catch(e => {
@@ -204,11 +211,10 @@ const CreateReviewScreen = ({route}) => {
         <FlatList
           style={{flexGrow: 0}}
           data={images.concat(getImages())}
-          // data={images}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
           horizontal={true}
-          scrollEnabled={true}
+          scrollEnabled={false}
         />
       </View>
 
@@ -229,7 +235,7 @@ const CreateReviewScreen = ({route}) => {
             backgroundColor: '#2978f4',
             borderRadius: 15,
           }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={AddReview}>
             <Text style={{color: 'white', fontSize: 20}}>완료</Text>
           </TouchableOpacity>
         </View>
