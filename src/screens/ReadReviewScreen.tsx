@@ -8,6 +8,7 @@ import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { err } from 'react-native-svg';
 import { useRecoilState } from 'recoil';
 import { ReviewState } from '../data/dataState';
+import { getRelativeTime } from '../utils/ExternalFunc';
 
 const ShowReviewScreen = ({route}) => {
   // Logics
@@ -55,20 +56,38 @@ const ShowReviewScreen = ({route}) => {
 
   const removeReview = (key: any) => {
     try {
-      database().ref('reviews').child(uid).child(key).remove();
+      database()
+        .ref('reviews')
+        .child(uid)
+        .child(key)
+        .remove();
     } catch (error) {
-      console.log('데이터 삭제: ', err);
+      console.log('리뷰 삭제 에러: ', err);
     }
   }
 
   const ReviewItemView = useCallback(({item, index}: any) => {
-    console.log("item: ", item)
     return (
       <View key={index} style={{display: 'flex', flexDirection: 'column'}}>
-        <View>
-          <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-            {item.placeName}
-          </Text>
+        <View
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+            
+          }}>
+          <View>
+            <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+              {item.nickname}
+            </Text>
+          </View>
+
+          {item.createdAt && (
+            <View>
+              <Text>{getRelativeTime(item.createdAt)}</Text>
+            </View>
+          )}
         </View>
         <View
           style={{
@@ -76,12 +95,18 @@ const ShowReviewScreen = ({route}) => {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
+            alignItems: 'center'
           }}>
-          <View>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+            }}>
             <StarRatingDisplay
               rating={item.rating}
               starSize={18}
-              emptyColor="white"
+              emptyColor="transparent"
             />
           </View>
           {item.uid === uid && (
@@ -100,17 +125,19 @@ const ShowReviewScreen = ({route}) => {
             </View>
           )}
         </View>
-        <View>
-          <FlatList
-            data={item.images}
-            style={{flexGrow: 0}}
-            renderItem={imageItemView}
-            keyExtractor={(item, index) => index.toString()}
-            scrollEnabled={false}
-            horizontal={true}
-          />
-        </View>
-        <View style={{marginTop: 20}}>
+        {item.images && (
+          <View>
+            <FlatList
+              data={item.images}
+              style={{flexGrow: 0}}
+              renderItem={imageItemView}
+              keyExtractor={(item, index) => index.toString()}
+              scrollEnabled={false}
+              horizontal={true}
+            />
+          </View>
+        )}
+        <View style={{marginTop: 10}}>
           <Text>{item.content}</Text>
         </View>
       </View>
@@ -131,7 +158,13 @@ const ShowReviewScreen = ({route}) => {
   const ItemSeparatorView = () => {
     return (
       <View
-        style={{height: 0.5, width: '100%', backgroundColor: '#c8c8c8'}}></View>
+        style={{
+          height: 0.5,
+          width: '100%',
+          backgroundColor: '#c8c8c8',
+          marginVertical: 10,
+        }}
+      />
     );
   };
 

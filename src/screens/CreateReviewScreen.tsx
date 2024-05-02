@@ -1,3 +1,4 @@
+import { firebase } from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -49,6 +50,7 @@ const CreateReviewScreen = ({route}) => {
           location: {latitude, longitude},
           content,
           images,
+          createdAt: firebase.database.ServerValue.TIMESTAMP
         })
         .once('value')
         .then(res => {
