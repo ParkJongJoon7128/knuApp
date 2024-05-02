@@ -31,4 +31,5 @@ export interface ReviewType {
   rating?: number;
   advantage?: string;
   disadvantage?: string;
+  images?: [];
 }

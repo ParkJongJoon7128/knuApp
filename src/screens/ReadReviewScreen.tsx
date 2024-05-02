@@ -3,7 +3,7 @@ import database from '@react-native-firebase/database';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { err } from 'react-native-svg';
 import { useRecoilState } from 'recoil';
@@ -62,10 +62,9 @@ const ShowReviewScreen = ({route}) => {
   }
 
   const ReviewItemView = useCallback(({item, index}: any) => {
+    console.log("item: ", item)
     return (
-      <View
-        key={index}
-        style={{paddingVertical: 10, display: 'flex', flexDirection: 'column'}}>
+      <View key={index} style={{display: 'flex', flexDirection: 'column'}}>
         <View>
           <Text style={{fontSize: 16, fontWeight: 'bold'}}>
             {item.placeName}
@@ -102,11 +101,32 @@ const ShowReviewScreen = ({route}) => {
           )}
         </View>
         <View>
+          <FlatList
+            data={item.images}
+            style={{flexGrow: 0}}
+            renderItem={imageItemView}
+            keyExtractor={(item, index) => index.toString()}
+            scrollEnabled={false}
+            horizontal={true}
+          />
+        </View>
+        <View style={{marginTop: 20}}>
           <Text>{item.content}</Text>
         </View>
       </View>
     );
   }, [uid]);
+
+  const imageItemView = useCallback(({item, index}: any) => {
+    return (
+      <View key={index} style={{marginRight: 10}}>
+        <Image
+          source={{uri: item.path}}
+          style={{width: 74, height: 74, borderRadius: 5.7}}
+        />
+      </View>
+    );
+  }, []);
 
   const ItemSeparatorView = () => {
     return (
@@ -117,20 +137,20 @@ const ShowReviewScreen = ({route}) => {
 
   // Views
   return (
-    <SafeAreaView style={styles.container}>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+    // 전체 레이아웃
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: 'white',
+      }}>
+      {/* 상단 리뷰 레이아웃 */}
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <View
           style={{
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            paddingVertical: 30,
           }}>
           <View
             style={{
@@ -146,74 +166,88 @@ const ShowReviewScreen = ({route}) => {
               <Text style={{fontSize: 32, fontWeight: 'bold'}}>{rating}</Text>
             </View>
           </View>
-          <View style={{marginTop: 15}}>
-            <Text style={{color: '#b5b5b5', fontWeight: 'bold'}}>
-              {reviewList.length}명 평가
-            </Text>
-          </View>
         </View>
-        <View
-          style={{
-            height: 7,
-            width: '100%',
-            backgroundColor: '#f9f9f9',
-          }}
-        />
+        <View style={{marginTop: 15}}>
+          <Text style={{color: '#b5b5b5', fontWeight: 'bold'}}>
+            {reviewList.length}명 평가
+          </Text>
+        </View>
       </View>
       <View
         style={{
+          height: 7,
+          width: '100%',
+          backgroundColor: '#f9f9f9',
+        }}
+      />
+
+      {/* 중간 리뷰 헤더 레이아웃 */}
+      <View
+        style={{
           flex: 4,
-          marginHorizontal: 15,
+          marginTop: 20,
+          // paddingVertical: 30,
+          // marginHorizontal: 20
         }}>
         <View
           style={{
-            justifyContent: 'center',
-            alignSelf: 'flex-start',
-            marginVertical: 15,
+            display: 'flex',
+            flexDirection: 'column',
+            paddingHorizontal: 20,
           }}>
-          <View>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignSelf: 'flex-start',
+              marginBottom: 5,
+            }}>
             <Text style={{fontSize: 16, fontWeight: 'bold'}}>
               리뷰 {reviewList.length}
             </Text>
           </View>
+
           <View
             style={{
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 10,
+              alignSelf: 'flex-start',
+              marginTop: 5,
             }}>
-            <CheckBox
-              disabled={false}
-              value={toggleCheckBox}
-              onValueChange={newValue => setToggleCheckBox(newValue)}
-              boxType="square"
-              onAnimationType="fade"
-              offAnimationType="fade"
-              style={{width: 16, height: 16}}
-            />
-            <View
-              style={{
-                marginHorizontal: 10,
-              }}>
+            <View>
+              <CheckBox
+                disabled={false}
+                value={toggleCheckBox}
+                onValueChange={newValue => setToggleCheckBox(newValue)}
+                boxType="square"
+                onAnimationType="fade"
+                offAnimationType="fade"
+                style={{width: 16, height: 16}}
+              />
+            </View>
+            <View style={{marginLeft: 10}}>
               <Text>사진 리뷰만 보기 </Text>
             </View>
           </View>
+
+          <View
+            style={{
+              height: 1,
+              marginVertical: 20,
+              backgroundColor: '#d2d2d2',
+            }}
+          />
         </View>
-        <View
-          style={{
-            height: 1,
-            width: '100%',
-            backgroundColor: '#d2d2d2',
-          }}
-        />
-        <FlatList
-          data={reviewList}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={ReviewItemView}
-          ItemSeparatorComponent={ItemSeparatorView}
-        />
+
+        {/* 중간 리뷰 레이아웃 */}
+        <View style={{marginHorizontal: 20}}>
+          <FlatList
+            data={reviewList}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={ReviewItemView}
+            ItemSeparatorComponent={ItemSeparatorView}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

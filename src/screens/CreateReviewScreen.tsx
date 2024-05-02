@@ -3,14 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import _ from 'lodash';
 import React, { useRef, useState } from 'react';
-import {
-  FlatList,
-  Image,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import StarRating from 'react-native-star-rating-widget';
@@ -55,7 +48,7 @@ const CreateReviewScreen = ({route}) => {
           rating,
           location: {latitude, longitude},
           content,
-          images
+          images,
         })
         .once('value')
         .then(res => {
@@ -117,7 +110,7 @@ const CreateReviewScreen = ({route}) => {
         <TouchableOpacity
           style={{
             borderWidth: 1,
-            borderColor: '#b6b6b6',
+            borderColor: '#efefef',
             borderRadius: 8,
             padding: 25,
             justifyContent: 'center',
@@ -127,6 +120,7 @@ const CreateReviewScreen = ({route}) => {
             ImageCropPicker.openPicker({
               mediaType: 'photo',
               multiple: true,
+              maxFiles: 3,
             })
               .then(image => {
                 console.log('image: ', image);
@@ -172,19 +166,29 @@ const CreateReviewScreen = ({route}) => {
           alignContent: 'center',
           marginBottom: 5,
         }}>
-        <Text style={{fontSize: 16, fontWeight: 'bold'}}>{place_name}</Text>
+        <Text style={{fontSize: 20, fontWeight: 'bold'}}>{place_name}</Text>
       </View>
 
       {/* 평점 레이아웃*/}
       <View style={{marginTop: 5, marginBottom: 5}}>
-        <StarRating rating={rating} onChange={setRating} starSize={24} />
+        <StarRating rating={rating} onChange={setRating} starSize={48} />
       </View>
+
+      {/* 분리선 레이아웃 */}
+      <View
+        style={{
+          width: '100%',
+          height: 1,
+          backgroundColor: '#efefef',
+          marginVertical: 20,
+        }}
+      />
 
       {/* 텍스트 인풋 레이아웃 */}
       <View
         style={{
           width: '100%',
-          height: 150,
+          height: 250,
           borderRadius: 15,
           padding: 15,
           backgroundColor: '#f6f6f6',
@@ -199,7 +203,17 @@ const CreateReviewScreen = ({route}) => {
           onSubmitEditing={handleAdvantageSubmit}
           returnKeyType="next"
           style={{margin: 0, padding: 0, flexShrink: 1}}
+          maxLength={300}
         />
+      </View>
+
+      {/* 텍스트 입력 갯수 표시 레이아웃 */}
+      <View
+        style={{
+          justifyContent: 'center',
+          alignSelf: 'flex-end',
+        }}>
+        <Text>{content.length} / 300</Text>
       </View>
 
       {/* 이미지 추가 레이아웃 */}
@@ -209,7 +223,7 @@ const CreateReviewScreen = ({route}) => {
           alignSelf: 'flex-start',
         }}>
         <FlatList
-          style={{flexGrow: 0}}
+          style={{flexGrow: 0, marginTop: 5}}
           data={images.concat(getImages())}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
