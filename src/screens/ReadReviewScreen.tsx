@@ -60,7 +60,22 @@ const ShowReviewScreen = ({route}) => {
         .ref('reviews')
         .child(uid)
         .child(key)
-        .remove();
+        .remove()
+        .then(res => {
+          console.log("리뷰 삭제: ", res);
+          setReviewList(currentList => {
+            const updatedList = currentList.filter(item => item.key !== key);
+            
+            // 새로운 평균 별점 계산
+            const newAverageRating = updatedList.reduce((acc, curr) => acc + curr.rating, 0) / updatedList.length;
+            
+            // 평균 별점 상태 업데이트
+            setRating(newAverageRating || 0); // 리뷰가 없을 경우 0으로 설정
+            
+            return updatedList;
+          });
+          // setReviewList(data => data.filter(item => item.key !== key));
+        })
     } catch (error) {
       console.log('리뷰 삭제 에러: ', err);
     }
@@ -132,7 +147,7 @@ const ShowReviewScreen = ({route}) => {
               style={{flexGrow: 0}}
               renderItem={imageItemView}
               keyExtractor={(item, index) => index.toString()}
-              scrollEnabled={false}
+              scrollEnabled={true}
               horizontal={true}
             />
           </View>
