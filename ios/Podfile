@@ -48,11 +48,6 @@ target 'KnuApp' do
   pod 'GoogleUtilities', :modular_headers => true
   pod 'FirebaseCore', :modular_headers => true
 
-  permissions_path = '../node_modules/react-native-permissions/ios'
-
-  pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
-  pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
-
   use_frameworks! :linkage => :static
   $RNFirebaseAsStaticFramework = true
 

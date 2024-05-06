@@ -1,7 +1,4 @@
-import {
-  KAKAO_REST_API_KEY,
-  KAKAO_SEARCH_LOCATION_API_URL
-} from '@env';
+import { KAKAO_REST_API_KEY, KAKAO_SEARCH_LOCATION_API_URL } from '@env';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetFlatList,
@@ -29,7 +26,7 @@ import { useRecoilState } from 'recoil';
 import {
   BottomSheetDataState,
   locationState,
-  userState
+  userState,
 } from '../data/dataState';
 import { truncateText } from '../utils/ExternalFunc';
 
@@ -47,7 +44,7 @@ const MainScreen = ({route}) => {
   const [filterData, setFilterData] = useState([]);
   const [masterData, setMasterData] = useState([]);
   const [focus, setFocus] = useState(false);
-  
+
   const [locationList, setLocationList] = useRecoilState(locationState);
   const [userList, setUserList] = useRecoilState(userState);
   const [bottomSheetList, setBottomSheetList] =
@@ -56,7 +53,7 @@ const MainScreen = ({route}) => {
   const mapRef = useRef<NaverMapView>(null);
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const snapPoints = useMemo(() => ['25%', '65%'], []);
+  const snapPoints = useMemo(() => ['25%', '45%'], []);
 
   const onAuthStateChanged = user => {
     setUser(user);
@@ -88,44 +85,46 @@ const MainScreen = ({route}) => {
 
   const searchAddress = async () => {
     try {
-      return await axios.get(KAKAO_SEARCH_LOCATION_API_URL, {
-        headers: {
-          Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
-          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-        },
-        params: {
-          query: address,
-        },
-      }).then(result => {
-        setFilterData(
-          result.data.documents.map(data => ({
-            place_name: data.place_name,
-            address_name: data.address_name,
-            category_group_name: data.category_group_name,
-            latitude: parseFloat(data.y),
-            longitude: parseFloat(data.x),
-          })),
-        );
-        setMasterData(
-          result.data.documents.map(data => ({
-            place_name: data.place_name,
-            address_name: data.address_name,
-            category_group_name: data.category_group_name,
-            latitude: parseFloat(data.y),
-            longitude: parseFloat(data.x),
-          })),
-        );
-        setLocationList(
-          result.data.documents.map(data => ({
-            address_name: data.address_name,
-            category_group_name: data.category_group_name,
-            phone_number: data.phone,
-            place_name: data.place_name,
-            latitude: parseFloat(data.y),
-            longitude: parseFloat(data.x),
-          })),
-        );
-      });
+      return await axios
+        .get(KAKAO_SEARCH_LOCATION_API_URL, {
+          headers: {
+            Authorization: `KakaoAK ${KAKAO_REST_API_KEY}`,
+            'Content-Type': ' application/json;charset=UTF-8 ',
+          },
+          params: {
+            query: address,
+          },
+        })
+        .then(result => {
+          setFilterData(
+            result.data.documents.map(data => ({
+              place_name: data.place_name,
+              address_name: data.address_name,
+              category_group_name: data.category_group_name,
+              latitude: parseFloat(data.y),
+              longitude: parseFloat(data.x),
+            })),
+          );
+          setMasterData(
+            result.data.documents.map(data => ({
+              place_name: data.place_name,
+              address_name: data.address_name,
+              category_group_name: data.category_group_name,
+              latitude: parseFloat(data.y),
+              longitude: parseFloat(data.x),
+            })),
+          );
+          setLocationList(
+            result.data.documents.map(data => ({
+              address_name: data.address_name,
+              category_group_name: data.category_group_name,
+              phone_number: data.phone,
+              place_name: data.place_name,
+              latitude: parseFloat(data.y),
+              longitude: parseFloat(data.x),
+            })),
+          );
+        });
     } catch (error) {
       console.log('주소 검색 에러: ', error);
       throw error; 
@@ -155,7 +154,7 @@ const MainScreen = ({route}) => {
       .child(uid)
       .once('value')
       .then(res => {
-        console.log("MainScreen: ", res);
+        console.log('MainScreen: ', res);
         setUserList(prev => [...prev, res]);
       })
       .catch(err => {
@@ -289,13 +288,6 @@ const MainScreen = ({route}) => {
               </TouchableOpacity>
             </View>
           </View>
-          {/* <View>
-            <Image
-              source={{uri: item.thumbnail_url}}
-              width={100}
-              height={100}
-            />
-          </View> */}
           <View
             style={{
               display: 'flex',
@@ -304,7 +296,7 @@ const MainScreen = ({route}) => {
               marginTop: 8,
             }}>
             <Text>{item.address_name}</Text>
-            {item.category_group_name ? (
+            {item.category_group_name && (
               <View
                 style={{
                   borderRadius: 15,
@@ -318,8 +310,6 @@ const MainScreen = ({route}) => {
                   {item.category_group_name}
                 </Text>
               </View>
-            ) : (
-              <></>
             )}
           </View>
         </View>
@@ -396,7 +386,6 @@ const MainScreen = ({route}) => {
         <View style={styles.textInputContainer}>
           <TextInput
             value={address}
-            // onChangeText={text => setAddress(text)}
             onChangeText={text => searchFilter(text)}
             placeholder="주소를 입력해주세요."
             style={styles.textinput}
