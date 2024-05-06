@@ -3,7 +3,8 @@ import database from '@react-native-firebase/database';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ImageModal from 'react-native-image-modal';
 import { StarRatingDisplay } from 'react-native-star-rating-widget';
 import { err } from 'react-native-svg';
 import { useRecoilState } from 'recoil';
@@ -162,9 +163,12 @@ const ShowReviewScreen = ({route}) => {
   const imageItemView = useCallback(({item, index}: any) => {
     return (
       <View key={index} style={{marginRight: 10}}>
-        <Image
-          source={{uri: item.path}}
+        <ImageModal
+          modalImageResizeMode="contain"
           style={{width: 74, height: 74, borderRadius: 5.7}}
+          source={{
+            uri: item.path,
+          }}
         />
       </View>
     );

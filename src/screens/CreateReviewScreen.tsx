@@ -6,6 +6,7 @@ import _ from 'lodash';
 import React, { useRef, useState } from 'react';
 import { FlatList, Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import ImageModal from 'react-native-image-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import StarRating from 'react-native-star-rating-widget';
 
@@ -85,9 +86,12 @@ const CreateReviewScreen = ({route}) => {
     // 이미지 첨부했을 때
     const ActiveImage = (
       <View key={index} style={{marginRight: 10}}>
-        <Image
-          source={{uri: item.path}}
+        <ImageModal
+          modalImageResizeMode="contain"
           style={{width: 74, height: 74, borderRadius: 5.7}}
+          source={{
+            uri: item.path,
+          }}
         />
         <TouchableOpacity
           style={{position: 'absolute', top: 6, right: 6}}
@@ -97,6 +101,7 @@ const CreateReviewScreen = ({route}) => {
           <Image
             style={{width: 14, height: 14}}
             source={require('../images/cancel.png')}
+            resizeMode="contain"
           />
         </TouchableOpacity>
       </View>
