@@ -17,6 +17,7 @@ import MainScreen from './src/screens/MainScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import ReadReviewScreen from './src/screens/ReadReviewScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
+import SearchPasswordScreen from './src/screens/SearchPasswordScreen';
 
 const Stack = createStackNavigator();
 
@@ -49,6 +50,16 @@ function App(): React.JSX.Element {
             name="Register"
             component={RegisterScreen}
             options={{headerShown: false}}
+          />
+
+          <Stack.Screen
+            name="SearchPwd"
+            component={SearchPasswordScreen}
+            options={{
+              headerTitle: '비밀번호 찾기',
+              headerBackTitleVisible: false,
+              // headerTintColor: 'black',
+            }}
           />
 
           <Stack.Screen

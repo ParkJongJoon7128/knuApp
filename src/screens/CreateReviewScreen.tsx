@@ -257,7 +257,7 @@ const CreateReviewScreen = ({route}) => {
             borderRadius: 15,
           }}>
           <TouchableOpacity onPress={AddReview}>
-            <Text style={{color: 'white', fontSize: 20}}>완료</Text>
+            <Text style={{color: 'white', fontSize: 16}}>완료</Text>
           </TouchableOpacity>
         </View>
       </View>

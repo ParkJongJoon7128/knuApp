@@ -206,7 +206,7 @@ const RegisterScreen = () => {
             marginTop: 30,
           }}>
           <TouchableOpacity onPress={() => Register(displayName, email, password)}>
-            <Text style={{color: 'white', fontSize: 20}}>회원가입</Text>
+            <Text style={{color: 'white', fontSize: 16}}>회원가입</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>

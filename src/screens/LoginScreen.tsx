@@ -59,131 +59,145 @@ const LoginScreen = () => {
 
   // Views
   return (
-    // 전체 레이아
-      <KeyboardAwareScrollView
-        contentContainerStyle={{
-          flex: 1,
+    // 전체 레이아웃
+    <KeyboardAwareScrollView
+      contentContainerStyle={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
+        paddingHorizontal: 30,
+      }}
+      resetScrollToCoords={{x: 0, y: 0}}
+      scrollEnabled={false}
+      extraHeight={300} // 키보드가 활성화 됐을 때 추가적으로 더 보여질 높이
+      enableOnAndroid={true} // 안드로이드에서도 동일하게 작동하도록 설정
+      keyboardShouldPersistTaps="handled">
+      {/* 텍스트 인풋 레이아웃 */}
+      <View
+        style={{
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'white',
-          paddingHorizontal: 30,
-        }}
-        resetScrollToCoords={{x: 0, y: 0}}
-        scrollEnabled={false}
-        extraHeight={300} // 키보드가 활성화 됐을 때 추가적으로 더 보여질 높이
-        enableOnAndroid={true} // 안드로이드에서도 동일하게 작동하도록 설정
-        keyboardShouldPersistTaps="handled">
-        {/* 텍스트 인풋 레이아웃 */}
+          width: '100%',
+          marginBottom: 30,
+        }}>
         <View
           style={{
-            justifyContent: 'center',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
             alignItems: 'center',
             width: '100%',
-            marginBottom: 30,
+            height: 60,
+            borderRadius: 15,
+            padding: 15,
+            backgroundColor: '#e5e5e5',
+            marginBottom: 7.5,
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-              height: 60,
-              borderRadius: 15,
-              padding: 15,
-              backgroundColor: '#e5e5e5',
-              marginBottom: 7.5,
-            }}>
-            <TextInput
-              placeholder="이메일"
-              onChangeText={text => setEmail(text)}
-              value={email}
-              onSubmitEditing={handleEmailSubmit}
-              returnKeyType="next"
-              style={{flex: 1, paddingVertical: 0}}
-            />
+          <TextInput
+            placeholder="이메일"
+            onChangeText={text => setEmail(text)}
+            value={email}
+            onSubmitEditing={handleEmailSubmit}
+            returnKeyType="next"
+            style={{flex: 1, paddingVertical: 0}}
+          />
 
-            <TouchableOpacity onPress={() => setEmail('')}>
+          <TouchableOpacity onPress={() => setEmail('')}>
+            <Image
+              source={require('../images/closecircle.png')}
+              style={{width: 24, height: 24, marginLeft: 10}}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            height: 60,
+            borderRadius: 15,
+            padding: 15,
+            backgroundColor: '#e5e5e5',
+            marginTop: 7.5,
+          }}>
+          <TextInput
+            placeholder="비밀번호"
+            onChangeText={text => setPwd(text)}
+            value={pwd}
+            ref={inputRef}
+            secureTextEntry={visible}
+            onSubmitEditing={() => Login(email, pwd)}
+            returnKeyType="done"
+            style={{flex: 1, paddingVertical: 0}}
+          />
+
+          {visible ? (
+            <TouchableOpacity onPress={() => setVisible(!visible)}>
               <Image
-                source={require('../images/closecircle.png')}
+                source={require('../images/visible.png')}
                 style={{width: 24, height: 24, marginLeft: 10}}
               />
             </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-              height: 60,
-              borderRadius: 15,
-              padding: 15,
-              backgroundColor: '#e5e5e5',
-              marginTop: 7.5,
-            }}>
-            <TextInput
-              placeholder="비밀번호"
-              onChangeText={text => setPwd(text)}
-              value={pwd}
-              ref={inputRef}
-              secureTextEntry={visible}
-              onSubmitEditing={() => Login(email, pwd)}
-              returnKeyType="done"
-              style={{flex: 1, paddingVertical: 0}}
-            />
-
-            {visible ? (
-              <TouchableOpacity onPress={() => setVisible(!visible)}>
-                <Image
-                  source={require('../images/visible.png')}
-                  style={{width: 24, height: 24, marginLeft: 10}}
-                />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={() => setVisible(!visible)}>
-                <Image
-                  source={require('../images/invisible.png')}
-                  style={{width: 24, height: 24, marginLeft: 10}}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
+          ) : (
+            <TouchableOpacity onPress={() => setVisible(!visible)}>
+              <Image
+                source={require('../images/invisible.png')}
+                style={{width: 24, height: 24, marginLeft: 10}}
+              />
+            </TouchableOpacity>
+          )}
         </View>
+      </View>
 
-        {/* 버튼 레이아웃 */}
+      {/* 버튼 레이아웃 */}
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          marginTop: 30,
+        }}>
         <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
             width: '100%',
-            marginTop: 30,
+            height: 60,
+            backgroundColor: '#2978f4',
+            borderRadius: 15,
+            marginBottom: 10,
           }}>
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '100%',
-              height: 60,
-              backgroundColor: '#2978f4',
-              borderRadius: 15,
-              marginBottom: 10,
-            }}>
-            <TouchableOpacity onPress={() => Login(email, pwd)}>
-              <Text style={{color: 'white', fontSize: 20}}>로그인</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={() => Login(email, pwd)}>
+            <Text style={{color: 'white', fontSize: 16}}>로그인</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* 회원가입 / 비밀번호 찾기 버튼 레이아웃 */}
+      <View
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: 10,
+        }}>
+        <View>
+          <TouchableOpacity onPress={() => navigation.navigate("SearchPwd")}>
+            <Text style={{color: '#9E9E9E'}}>비밀번호 찾기</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* 회원가입 버튼 레이아웃 */}
-        <View style={{display: 'flex', alignSelf: 'flex-end', marginTop: 10}}>
-          <TouchableOpacity
-            // style={styles.registerButton}
-            onPress={() => navigation.navigate('Register')}>
+        <View>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
             <Text>회원가입</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAwareScrollView>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 
