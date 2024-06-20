@@ -19,9 +19,8 @@ const RegisterScreen = () => {
   // Logic
   const navigation =
     useNavigation<NativeStackNavigationProp<ROOT_NAVIGATION>>();
-  // const userCollection = firestore().collection('users');
 
-  const [displayName, setDisplayName] = useState('');
+  const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(true);
@@ -41,8 +40,8 @@ const RegisterScreen = () => {
     }
   };
 
-  const Register = (name: string, email: string, password: string) => {
-    if (!name || !email || !password) {
+  const Register = (nickname: string, email: string, password: string) => {
+    if (!nickname || !email || !password) {
       Alert.alert('값을 입력해주세요');
     } else {
       return firebase
@@ -50,23 +49,19 @@ const RegisterScreen = () => {
         .createUserWithEmailAndPassword(email, password)
         .then(result => {
           const {uid} = result.user;
-          firebase.auth().currentUser?.updateProfile({displayName});
+          firebase.auth().currentUser?.updateProfile({displayName: nickname});
           database().ref('users/').child(uid).set({
             date_created: moment().utc().format(),
-            NickName: name,
+            nickname,
             email,
           });
-          // firestore().collection('users').doc(uid).set({
-          //   date_created: moment().utc().format(),
-          //   uid,
-          //   name,
-          //   email,
-          // });
-          setDisplayName('');
+          setNickname('');
           setEmail('');
           setPassword('');
           navigation.navigate('Login');
+          console.group('----- Register Group -----');
           console.log('Register: ', result.user);
+          console.groupEnd()
         })
         .catch(err => {
           console.log(err.message);
@@ -111,13 +106,13 @@ const RegisterScreen = () => {
             }}>
             <TextInput
               placeholder="닉네임"
-              onChangeText={text => setDisplayName(text)}
-              value={displayName}
+              onChangeText={text => setNickname(text)}
+              value={nickname}
               onSubmitEditing={handleEmailSubmit}
               returnKeyType="next"
               style={{flex: 1, paddingVertical: 0}}
             />
-            <TouchableOpacity onPress={() => setDisplayName('')}>
+            <TouchableOpacity onPress={() => setNickname('')}>
               <Image
                 source={require('../images/closecircle.png')}
                 style={{width: 24, height: 24, marginLeft: 10}}
@@ -173,7 +168,7 @@ const RegisterScreen = () => {
               value={password}
               ref={passwordRef}
               secureTextEntry={visible}
-              onSubmitEditing={() => Register(displayName, email, password)}
+              onSubmitEditing={() => Register(nickname, email, password)}
               style={{flex: 1, paddingVertical: 0}}
             />
             {visible ? (
@@ -205,7 +200,7 @@ const RegisterScreen = () => {
             borderRadius: 15,
             marginTop: 30,
           }}>
-          <TouchableOpacity onPress={() => Register(displayName, email, password)}>
+          <TouchableOpacity onPress={() => Register(nickname, email, password)}>
             <Text style={{color: 'white', fontSize: 16}}>회원가입</Text>
           </TouchableOpacity>
         </View>

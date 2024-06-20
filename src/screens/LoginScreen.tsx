@@ -38,18 +38,17 @@ const LoginScreen = () => {
         .auth()
         .signInWithEmailAndPassword(email, pwd)
         .then(result => {
+          console.group("----- Login Group -----")
           console.log(
             'Login: ',
             result.user.email,
             result.user.displayName,
             result.user.uid,
           );
+          console.groupEnd()
           setEmail('');
           setPwd('');
-          navigation.navigate('Main', {
-            uid: result.user.uid,
-            nickname: result.user.displayName,
-          });
+          navigation.navigate("Main")
         })
         .catch(err => {
           console.log(err.message);
