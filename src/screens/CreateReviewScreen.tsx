@@ -28,7 +28,7 @@ const CreateReviewScreen = ({route}) => {
   const [rating, setRating] = useState(0);
   const [images, setImages] = useState([]);
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<TextInput>(null);
 
   const handleAdvantageSubmit = () => {
     if (inputRef.current) {

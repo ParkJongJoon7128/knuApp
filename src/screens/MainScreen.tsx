@@ -1,16 +1,25 @@
-import React from 'react';
-import { Text, View } from 'react-native';
+import React, { useRef } from 'react';
+import { View } from 'react-native';
+import NaverMapView from 'react-native-nmap';
 
 const MainScreen = () => {
+  // Logic
+  const mapRef = useRef<NaverMapView>(null);
+
+  const knuAddr = {
+    latitude: 37.273629699499,
+    longitude: 127.12928668205
+  }
+
+  // Views
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-      }}>
-      <Text>MainScreen</Text>
+    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <NaverMapView
+        style={{width: '100%', height: '100%'}}
+        ref={mapRef}
+        showsMyLocationButton={true}
+        center={{...knuAddr, zoom: 16}}
+      />
     </View>
   );
 }

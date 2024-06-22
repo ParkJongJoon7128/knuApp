@@ -22,7 +22,7 @@ const LoginScreen = () => {
   const [pwd, setPwd] = useState('');
   const [visible, setVisible] = useState(true);
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<TextInput>(null);
 
   const handleEmailSubmit = () => {
     if (inputRef.current) {

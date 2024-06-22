@@ -25,8 +25,8 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(true);
 
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
 
   const handleEmailSubmit = () => {
     if (emailRef.current) {
