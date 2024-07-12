@@ -9,7 +9,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
@@ -38,17 +38,17 @@ const LoginScreen = () => {
         .auth()
         .signInWithEmailAndPassword(email, pwd)
         .then(result => {
-          console.group("----- Login Group -----")
+          console.group('----- Login Group -----');
           console.log(
             'Login: ',
             result.user.email,
             result.user.displayName,
             result.user.uid,
           );
-          console.groupEnd()
+          console.groupEnd();
           setEmail('');
           setPwd('');
-          navigation.navigate("Main")
+          navigation.navigate('Tabs');
         })
         .catch(err => {
           console.log(err.message);
@@ -98,12 +98,14 @@ const LoginScreen = () => {
             value={email}
             onSubmitEditing={handleEmailSubmit}
             returnKeyType="next"
+            autoCapitalize="none"
+            keyboardType="email-address"
             style={{flex: 1, paddingVertical: 0}}
           />
 
           <TouchableOpacity onPress={() => setEmail('')}>
             <Image
-              source={require('../images/closecircle.png')}
+              source={require('../assets/images/closecircle.png')}
               style={{width: 24, height: 24, marginLeft: 10}}
             />
           </TouchableOpacity>
@@ -135,14 +137,14 @@ const LoginScreen = () => {
           {visible ? (
             <TouchableOpacity onPress={() => setVisible(!visible)}>
               <Image
-                source={require('../images/visible.png')}
+                source={require('../assets/images/visible.png')}
                 style={{width: 24, height: 24, marginLeft: 10}}
               />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity onPress={() => setVisible(!visible)}>
               <Image
-                source={require('../images/invisible.png')}
+                source={require('../assets/images/invisible.png')}
                 style={{width: 24, height: 24, marginLeft: 10}}
               />
             </TouchableOpacity>
@@ -185,7 +187,7 @@ const LoginScreen = () => {
           marginTop: 10,
         }}>
         <View>
-          <TouchableOpacity onPress={() => navigation.navigate("SearchPwd")}>
+          <TouchableOpacity onPress={() => navigation.navigate('SearchPwd')}>
             <Text style={{color: '#9E9E9E'}}>비밀번호 찾기</Text>
           </TouchableOpacity>
         </View>

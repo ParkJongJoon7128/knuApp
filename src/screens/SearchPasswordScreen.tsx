@@ -73,7 +73,7 @@ const SearchPasswordScreen = () => {
         }}>
         <View style={{display: 'flex', flexDirection: 'row', marginBottom: 10}}>
           <Image
-            source={require('../images/sms.png')}
+            source={require('../assets/images/sms.png')}
             style={{width: 18, height: 18, marginRight: 2.5}}
           />
           <Text style={{fontSize: 18, fontWeight: 'bold', marginLeft: 2.5}}>

@@ -6,20 +6,11 @@
  */
 
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect } from 'react';
-import { Image, PermissionsAndroid, Platform, TextInput, TouchableOpacity, View } from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import { RecoilRoot } from 'recoil';
-import CreateReviewScreen from './src/screens/CreateReviewScreen';
-import LoginScreen from './src/screens/LoginScreen';
-import MainScreen from './src/screens/MainScreen';
-import ProfileScreen from './src/screens/ProfileScreen';
-import ReadReviewScreen from './src/screens/ReadReviewScreen';
-import RegisterScreen from './src/screens/RegisterScreen';
-import SearchPasswordScreen from './src/screens/SearchPasswordScreen';
-
-const Stack = createStackNavigator();
+import AppNavigator from './src/navigation/AppNavigator';
 
 function App(): React.JSX.Element {
   // Logic
@@ -40,86 +31,7 @@ function App(): React.JSX.Element {
   return (
     <RecoilRoot>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            options={{headerShown: false}}
-          />
-
-          <Stack.Screen
-            name="SearchPwd"
-            component={SearchPasswordScreen}
-            options={{
-              headerTitle: '비밀번호 찾기',
-              headerBackTitleVisible: false,
-              // headerTintColor: 'black',
-            }}
-          />
-
-          <Stack.Screen
-            name="Profile"
-            component={ProfileScreen}
-            options={{headerShown: false}}
-          />
-
-          <Stack.Screen
-            name="Main"
-            component={MainScreen}
-            options={{
-              headerTitle: props => {
-                return (
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row', // 자식 요소들을 수평으로 배치
-                      justifyContent: 'space-between', // 자식 요소들 간의 공간을 균등하게 배분
-                      alignItems: 'center', // 자식 요소들을 수직으로 가운데 정렬
-                      padding: 10,
-                    }}>
-                    <TextInput
-                      placeholder="지도 검색"
-                      style={{
-                        width: 300,
-                        height: 45,
-                        padding: 10,
-                        borderRadius: 5,
-                        backgroundColor: '#e7e9eb',
-                        marginRight: 15,
-                      }}
-                    />
-                    <TouchableOpacity>
-                      <Image
-                        source={require('./src/images/bookmark.png')}
-                        style={{width: 30, height: 30}}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                );
-              },
-              headerLeft: () => null,
-              headerShadowVisible: false,
-              gestureEnabled: false
-            }}
-          />
-
-          <Stack.Screen
-            name="CreateReview"
-            component={CreateReviewScreen}
-            options={{headerShown: false}}
-          />
-
-          <Stack.Screen
-            name="ReadReview"
-            component={ReadReviewScreen}
-            options={{title: '리뷰관리'}}
-          />
-        </Stack.Navigator>
+        <AppNavigator />
       </NavigationContainer>
     </RecoilRoot>
   );

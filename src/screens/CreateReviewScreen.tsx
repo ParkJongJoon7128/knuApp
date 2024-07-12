@@ -100,7 +100,7 @@ const CreateReviewScreen = ({route}) => {
           }}>
           <Image
             style={{width: 14, height: 14}}
-            source={require('../images/cancel.png')}
+            source={require('../assets/images/cancel.png')}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -138,7 +138,7 @@ const CreateReviewScreen = ({route}) => {
               });
           }}>
           <Image
-            source={require('../images/camera.png')}
+            source={require('../assets/images/camera.png')}
             style={{width: 20, height: 20}}
             resizeMode="contain"
             tintColor="#b6b6b6"
