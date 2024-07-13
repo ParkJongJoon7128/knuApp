@@ -5,10 +5,11 @@
  * @format
  */
 
-import { NavigationContainer } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { PermissionsAndroid, Platform } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RecoilRoot } from 'recoil';
 import AppNavigator from './src/navigation/AppNavigator';
 
@@ -30,9 +31,11 @@ function App(): React.JSX.Element {
   // Views
   return (
     <RecoilRoot>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <GestureHandlerRootView>
+        <SafeAreaProvider>
+          <AppNavigator />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
     </RecoilRoot>
   );
 }

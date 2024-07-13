@@ -4,6 +4,7 @@ declare type ROOT_NAVIGATION = {
   SearchPwd: undefined;
   Tabs: undefined;
   MainTabs: undefined;
+  SearchLocationTabs: undefined;
   // Main: undefined;
   // CreateReview: undefined;
   // ReadReview: undefined;
