@@ -39,15 +39,21 @@ const MainScreen = () => {
     [],
   );
 
-  const locationRenderItem = ({item, index}) => {
+  const locationRenderItem = ({item}) => {
     return (
-      <View key={index} style={{flexDirection: 'column'}}>
-        <Text>{item.name}</Text>
+      <View
+        style={{
+          flex: 1,
+          paddingHorizontal: 15,
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
         <Image
           source={{uri: item.imageUrl?.toString()}}
-          style={{width: 250, height: 50}}
-          resizeMode="contain"
+          style={{width: '100%', height: 200}}
         />
+        <Text style={{alignSelf: 'flex-start'}}>{item.name}</Text>
       </View>
     );
   };
@@ -90,7 +96,11 @@ const MainScreen = () => {
           onChange={handleSheetChanges}
           backdropComponent={handleSheetBackdrop}>
           <BottomSheetView>
-            <FlatList data={data} renderItem={locationRenderItem} />
+            <FlatList
+              data={data}
+              renderItem={locationRenderItem}
+              keyExtractor={(_, index) => index.toString()}
+            />
           </BottomSheetView>
         </BottomSheetModal>
       </BottomSheetModalProvider>
